@@ -4,11 +4,14 @@ set -eu
 
 repo_dir="$(cd "$(dirname "$0")/.." && pwd)"
 doc="$repo_dir/docs/RELEASE-CHECKLIST.md"
+version="$(tr -d '[:space:]' < "$repo_dir/VERSION")"
+pep440="$(printf '%s' "$version" | sed 's/-rc\./rc/')"
+tag="v$version"
 
-grep -Fq 'VERSION=1.0.0-rc.9' "$doc"
-grep -Fq 'PYPI_VERSION=1.0.0rc9' "$doc"
-grep -Fq 'TAG=v1.0.0-rc.9' "$doc"
-grep -Fq 'RELEASE_BRANCH=release/v1.0.0-rc.9' "$doc"
+grep -Fq "VERSION=$version" "$doc"
+grep -Fq "PYPI_VERSION=$pep440" "$doc"
+grep -Fq "TAG=$tag" "$doc"
+grep -Fq "RELEASE_BRANCH=release/$tag" "$doc"
 grep -Fq -- '--repo suraj-subrahmanyan/OpenSolar' "$doc"
 grep -Fq 'bash tests/test-release-cut-safety.sh' "$doc"
 grep -Fq 'bash tests/test-release-public-tree.sh' "$doc"
@@ -28,6 +31,7 @@ grep -Fq 'runtime.guidance' "$doc"
 grep -Fq 'runtime.login_command' "$doc"
 
 while IFS= read -r script; do
+    [ -n "$script" ] || continue
     [ -f "$repo_dir/$script" ] || {
         echo "FAIL: checklist references missing script: $script" >&2
         exit 1
@@ -41,4 +45,4 @@ if grep -Eq 'Stellven/OpenSolar|1\.0\.0-rc\.6|1\.0\.0rc3|git switch "\$RELEASE_B
     exit 1
 fi
 
-echo "release checklist contract passed: rc.9, origin-only, valid gates, safe review, scoped artifacts"
+echo "release checklist contract passed: $version, origin-only, valid gates, safe review, scoped artifacts"

@@ -20,6 +20,16 @@
 # --- contain token-bearing FILENAMES, so it excludes itself) ---
 release-exclude.txt
 
+# --- generated/runtime evidence retained only in Git history ---
+Feature list stuff
+harness/artifacts
+harness/tmp
+harness/.pm
+docs/testing/test-runs
+docs/testing/xlsx
+docs/testing/qa_feature_inventory_l123.xlsx
+outputs
+
 # --- root trigger docs (CLAUDE.md is scrubbed + KEPT, not excluded) ---
 DESIGN_WORKLOG.md
 SPRINTS-HIGHLIGHTS.md

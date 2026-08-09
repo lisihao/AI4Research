@@ -1,32 +1,32 @@
 {
   "by_coverage_status": {
-    "covered": 1550,
-    "missing-or-indirect": 133,
-    "partial-or-unmapped": 20,
+    "covered": 1503,
+    "missing-or-indirect": 124,
+    "partial-or-unmapped": 19,
     "static-validation-required": 21
   },
   "by_l1": {
     "AutoSci": 37,
     "Benchmarks": 8,
     "Browser": 2,
-    "CI": 22,
+    "CI": 23,
     "CLI": 11,
     "Components": 16,
     "Core": 3,
-    "Dashboard": 3,
+    "Dashboard": 6,
     "Desktop": 16,
-    "Harness": 1109,
+    "Harness": 1038,
     "Hooks": 89,
     "Ingestion": 39,
     "Installer": 17,
     "Packaging": 14,
-    "QA Gates": 28,
+    "QA Gates": 36,
     "Reports": 13,
     "Repository": 91,
-    "Research": 44,
+    "Research": 45,
     "Runtime": 3,
     "Skills": 88,
-    "Status Server": 66,
+    "Status Server": 67,
     "TVS": 5
   },
   "by_source_type": {
@@ -34,15 +34,15 @@
     "manifest": 3,
     "module": 14,
     "package-bin": 2,
-    "package-script": 25,
-    "python-cli": 1111,
-    "route": 121,
+    "package-script": 28,
+    "python-cli": 1084,
+    "route": 122,
     "shell-cli": 11,
-    "shell-script": 334,
+    "shell-script": 299,
     "skill": 73,
-    "workflow": 22
+    "workflow": 23
   },
-  "feature_rows": 1724,
+  "feature_rows": 1667,
   "outputs": [
     "docs/testing/qa_feature_inventory.csv",
     "docs/testing/qa_feature_inventory.md",
@@ -51,6 +51,6 @@
     "docs/testing/qa_master_pass_fail_table.csv",
     "docs/testing/qa_master_pass_fail_table.md"
   ],
-  "test_files": 931,
-  "tracked_files": 4383
+  "test_files": 1101,
+  "tracked_files": 3944
 }

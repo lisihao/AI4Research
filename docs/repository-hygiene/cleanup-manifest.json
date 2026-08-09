@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "cleanup_date": "2026-08-09",
+  "mode": "forward-only",
+  "baseline_commit": "4d60f1e03b40b3e1bb618afe7136ef1687f2d5a4",
+  "history_rewritten": false,
+  "totals": {
+    "tracked_paths": 1838,
+    "checkout_bytes": 430805072
+  },
+  "removed": [
+    {
+      "path": "Feature list stuff",
+      "git_object": "c95a6be62aa6a6e1626f4ee3cba0371f4f90b18e",
+      "kind": "tree",
+      "tracked_paths": 282,
+      "checkout_bytes": 387050122,
+      "reason": "Imported source/evidence bundle with large media and generated documents; no canonical product implementation."
+    },
+    {
+      "path": "harness/artifacts",
+      "git_object": "53713b52eb681c1fe81f8d1539fa727d72cb6921",
+      "kind": "tree",
+      "tracked_paths": 674,
+      "checkout_bytes": 5202568,
+      "reason": "Generated AutoSci and scientific workflow run evidence, including run-specific helpers."
+    },
+    {
+      "path": "harness/.pm",
+      "git_object": "66a3129f0c24b4087e5e2e538a3d620a470a7bc4",
+      "kind": "tree",
+      "tracked_paths": 18,
+      "checkout_bytes": 504588,
+      "reason": "Task-specific planning and orchestration state."
+    },
+    {
+      "path": "harness/tmp",
+      "git_object": "6ba52d2bbaaa5ad8a287f7ad1e9197a0608e0c6a",
+      "kind": "tree",
+      "tracked_paths": 22,
+      "checkout_bytes": 80404,
+      "reason": "Runtime output containing machine-specific paths."
+    },
+    {
+      "path": "docs/testing/test-runs",
+      "git_object": "392fc171a195addfa58a0c7f9cbda833c1878ffd",
+      "kind": "tree",
+      "tracked_paths": 820,
+      "checkout_bytes": 4692085,
+      "reason": "Generated test-run status and evidence."
+    },
+    {
+      "path": "docs/testing/xlsx",
+      "git_object": "a2d01f19efdfd8daea3424e71341fabc8aaf91f3",
+      "kind": "tree",
+      "tracked_paths": 14,
+      "checkout_bytes": 33078808,
+      "reason": "Generated workbook previews and inspection output."
+    },
+    {
+      "path": "docs/testing/qa_feature_inventory_l123.xlsx",
+      "git_object": "983b13131584b28a10f58711aae18adcfa80e161",
+      "kind": "blob",
+      "tracked_paths": 1,
+      "checkout_bytes": 179943,
+      "reason": "Generated QA workbook; canonical CSV and Markdown remain reproducible."
+    },
+    {
+      "path": "outputs",
+      "git_object": "f06ad088c74b1f456111ad368aa4d1242281c31b",
+      "kind": "tree",
+      "tracked_paths": 6,
+      "checkout_bytes": 16554,
+      "reason": "Generated output plus helpers hard-coded to another machine."
+    },
+    {
+      "path": "harness/logs/.gitkeep",
+      "git_object": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "blob",
+      "tracked_paths": 1,
+      "checkout_bytes": 0,
+      "reason": "Runtime log directory is created on demand and remains ignored."
+    }
+  ]
+}

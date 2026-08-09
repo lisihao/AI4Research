@@ -8,33 +8,33 @@
 
 ## Counts
 
-- Tracked files scanned: 4383
-- Test files detected: 931
-- Feature rows generated: 1724
+- Tracked files scanned: 3944
+- Test files detected: 1101
+- Feature rows generated: 1667
 
 ## Feature Rows by L1
 
 - AutoSci: 37
 - Benchmarks: 8
 - Browser: 2
-- CI: 22
+- CI: 23
 - CLI: 11
 - Components: 16
 - Core: 3
-- Dashboard: 3
+- Dashboard: 6
 - Desktop: 16
-- Harness: 1109
+- Harness: 1038
 - Hooks: 89
 - Ingestion: 39
 - Installer: 17
 - Packaging: 14
-- QA Gates: 28
+- QA Gates: 36
 - Reports: 13
 - Repository: 91
-- Research: 44
+- Research: 45
 - Runtime: 3
 - Skills: 88
-- Status Server: 66
+- Status Server: 67
 - TVS: 5
 
 ## Feature Rows by Source Type
@@ -43,19 +43,19 @@
 - manifest: 3
 - module: 14
 - package-bin: 2
-- package-script: 25
-- python-cli: 1111
-- route: 121
+- package-script: 28
+- python-cli: 1084
+- route: 122
 - shell-cli: 11
-- shell-script: 334
+- shell-script: 299
 - skill: 73
-- workflow: 22
+- workflow: 23
 
 ## Coverage Status
 
-- covered: 1550
-- missing-or-indirect: 133
-- partial-or-unmapped: 20
+- covered: 1503
+- missing-or-indirect: 124
+- partial-or-unmapped: 19
 - static-validation-required: 21
 
 ## Rows Needing Explicit Test Mapping
@@ -70,16 +70,7 @@
 - `components.component_manifests.component.12`: components.d/skills-office/component.sh (component)
 - `components.component_manifests.component.13`: components.d/solar-max/component.sh (component)
 - `components.component_manifests.component.14`: components.d/status-daemon/component.sh (component)
-- `desktop.solar_desktop.script.build_linux`: desktop/package.json (package script: build:linux)
-- `desktop.solar_desktop.script.build_mac`: desktop/package.json (package script: build:mac)
-- `desktop.solar_desktop.script.build_renderer`: desktop/package.json (package script: build:renderer)
-- `desktop.solar_desktop.script.build_win`: desktop/package.json (package script: build:win)
-- `desktop.solar_desktop.script.prepackage_check`: desktop/package.json (package script: prepackage-check)
-- `desktop.solar_desktop.script.selftest`: desktop/package.json (package script: selftest)
-- `desktop.solar_desktop.script.start`: desktop/package.json (package script: start)
-- `desktop.electron_shell.verify_macos_package`: desktop/verify-macos-package.sh (verify-macos-package)
 - `hooks.runtime_hooks.asset_reminder`: hooks/asset-reminder.sh (asset-reminder)
-- `hooks.runtime_hooks.auto_checkpoint`: hooks/auto-checkpoint.sh (auto-checkpoint)
 - `hooks.runtime_hooks.auto_favorites_extract`: hooks/auto-favorites-extract.sh (auto-favorites-extract)
 - `hooks.runtime_hooks.cortex_hook`: hooks/cortex-hook.sh (cortex-hook)
 - `hooks.runtime_hooks.design_cortex_reminder`: hooks/design-cortex-reminder.sh (design-cortex-reminder)
@@ -105,7 +96,6 @@
 - `hooks.runtime_hooks.personality_injector`: hooks/personality-injector.sh (personality-injector)
 - `hooks.runtime_hooks.portable`: hooks/lib/portable.sh (portable)
 - `hooks.runtime_hooks.post_edit`: hooks/post-edit.sh (post-edit)
-- `hooks.runtime_hooks.post_tool_dispatcher`: hooks/post-tool-dispatcher.sh (post-tool-dispatcher)
 - `hooks.runtime_hooks.post_tool_failure_recorder`: hooks/post-tool-failure-recorder.sh (post-tool-failure-recorder)
 - `hooks.runtime_hooks.pre_bash`: hooks/pre-bash.sh (pre-bash)
 - `hooks.runtime_hooks.pre_compact_anchor`: hooks/pre-compact-anchor.sh (pre-compact-anchor)
@@ -140,7 +130,17 @@
 - `installer.installer_library.components`: lib/installer/components.sh (components)
 - `installer.installer_library.config_vars`: lib/installer/config-vars.sh (config-vars)
 - `installer.installer_library.copy_engine`: lib/installer/copy-engine.sh (copy-engine)
-- ... 53 more rows in CSV
+- `installer.installer_library.db_init`: lib/installer/db-init.sh (db-init)
+- `installer.installer_library.main`: lib/installer/main.sh (main)
+- `installer.installer_library.mcp_register`: lib/installer/mcp-register.sh (mcp-register)
+- `installer.installer_library.migrate`: lib/installer/migrate.sh (migrate)
+- `installer.installer_library.paths`: lib/installer/paths.sh (paths)
+- `installer.installer_library.py_deps`: lib/installer/py-deps.sh (py-deps)
+- `installer.installer_library.receipt`: lib/installer/receipt.sh (receipt)
+- `installer.installer_library.render_template`: lib/installer/render-template.sh (render-template)
+- `installer.installer_library.settings_merge`: lib/installer/settings-merge.sh (settings-merge)
+- `installer.installer_library.system_deps`: lib/installer/system-deps.sh (system-deps)
+- ... 44 more rows in CSV
 
 ## Static Validation Rows
 

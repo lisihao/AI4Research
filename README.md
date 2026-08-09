@@ -10,7 +10,7 @@ AI4Research 是 Solar 体系在 `Stellven/AI4Research` 仓库中的产品化分�
 - 将状态、上下文、路由、评审与交付证据外置为可审计 artifacts；
 - 同时支撑代码交付（Product Delivery）和科研工作流（AutoSci / DeepResearch）。
 
-> **当前发布线：** `VERSION` 为 `1.0.0-rc.9`。仓库根目录的 Bun package metadata 仍保留 `3.0.0`，它不应被解释为当前安装器发行版本。  
+> **当前发布线：** `VERSION` 为 `1.0.0-rc.9`，根目录 Bun package、桌面包与 pipx metadata 均由该文件同步。
 > **当前主分支：** `openJiuwen-Solar`。  
 > **成熟度：** Release Candidate；适合本地试用、架构研究与受控团队内实验，不应直接视为多租户生产控制平面。
 
@@ -912,7 +912,7 @@ spec、runtime state、closure、event ledger、gate ledger、evidence ledger、
 
 - `VERSION`: `1.0.0-rc.9`
 - pipx package: `1.0.0rc9`
-- root Bun package: `3.0.0`
+- root Bun package: `1.0.0-rc.9`
 
 发行流程应定义单一 version source of truth。
 

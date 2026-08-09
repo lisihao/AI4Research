@@ -771,7 +771,7 @@ def write_csv(features: list[Feature], path: Path) -> None:
         "notes",
     ]
     with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         for row in features:
             writer.writerow(feature_inventory_row(row))
@@ -898,7 +898,7 @@ def write_master_table(features: list[Feature], csv_path: Path, md_path: Path) -
         )
 
     with csv_path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -1046,6 +1046,7 @@ def write_feature_list(features: list[Feature], path: Path) -> None:
                 "Level 2 Feature",
                 "Specific Inputs / Outputs Supported",
             ],
+            lineterminator="\n",
         )
         writer.writeheader()
         writer.writerows(rows)

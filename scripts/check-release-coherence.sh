@@ -29,6 +29,14 @@ TAG="v$VERSION"
 # PEP 440 form for the pipx package: 1.0.0-rc.8 -> 1.0.0rc8
 PEP440="$(printf '%s' "$VERSION" | sed 's/-rc\./rc/')"
 
+# ---- check 0: VERSION is the single source of truth -----------------------
+log "check 0: all maintained version metadata derives from VERSION"
+if python3 scripts/sync-version-metadata.py --check; then
+    ok "version metadata synchronized"
+else
+    fail "version metadata drift; run: python3 scripts/sync-version-metadata.py"
+fi
+
 # ---- check 1: get-solar.sh channel default == the version being cut -------
 log "check 1: get-solar.sh SOLAR_CHANNEL default == $TAG (PKG-001)"
 CHANNEL_DEFAULT="$(sed -n 's/^SOLAR_CHANNEL="\${SOLAR_CHANNEL:-\([^}]*\)}"$/\1/p' get-solar.sh)"
