@@ -8,9 +8,9 @@
 
 ## Counts
 
-- Tracked files scanned: 3944
-- Test files detected: 1101
-- Feature rows generated: 1667
+- Tracked files scanned: 3956
+- Test files detected: 1104
+- Feature rows generated: 1670
 
 ## Feature Rows by L1
 
@@ -28,7 +28,7 @@
 - Ingestion: 39
 - Installer: 17
 - Packaging: 14
-- QA Gates: 36
+- QA Gates: 39
 - Reports: 13
 - Repository: 91
 - Research: 45
@@ -47,14 +47,14 @@
 - python-cli: 1084
 - route: 122
 - shell-cli: 11
-- shell-script: 299
+- shell-script: 302
 - skill: 73
 - workflow: 23
 
 ## Coverage Status
 
 - covered: 1503
-- missing-or-indirect: 124
+- missing-or-indirect: 127
 - partial-or-unmapped: 19
 - static-validation-required: 21
 
@@ -140,7 +140,7 @@
 - `installer.installer_library.render_template`: lib/installer/render-template.sh (render-template)
 - `installer.installer_library.settings_merge`: lib/installer/settings-merge.sh (settings-merge)
 - `installer.installer_library.system_deps`: lib/installer/system-deps.sh (system-deps)
-- ... 44 more rows in CSV
+- ... 47 more rows in CSV
 
 ## Static Validation Rows
 

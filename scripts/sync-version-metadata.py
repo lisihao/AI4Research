@@ -32,6 +32,10 @@ BARE_VERSION_SURFACES = (
     "docs/FIRST-SESSION.md",
     "docs/RELEASE-CHECKLIST.md",
 )
+# Owner-only release instructions are intentionally omitted from the public
+# orphan cut. Synchronize them in the maintained checkout, but do not make the
+# already-excluded cut tree invalid solely because this file is absent.
+OPTIONAL_SURFACES = {"docs/RELEASE-CHECKLIST.md"}
 TAG_RE = re.compile(r"v\d+\.\d+\.\d+(?:-rc\.\d+)?")
 SEMVER_RE = re.compile(r"(?<![A-Za-z0-9])\d+\.\d+\.\d+-rc\.\d+(?![A-Za-z0-9])")
 PEP440_RE = re.compile(r"(?<![A-Za-z0-9])\d+\.\d+\.\d+rc\d+(?![A-Za-z0-9])")
@@ -93,10 +97,14 @@ def synchronize(root: Path, *, write: bool) -> list[str]:
             changed.append(relative)
 
     for relative in TAG_SURFACES:
+        if not (root / relative).exists() and relative in OPTIONAL_SURFACES:
+            continue
         if _replace(root / relative, lambda text: TAG_RE.sub(tag, text), write=write):
             changed.append(relative)
 
     for relative in BARE_VERSION_SURFACES:
+        if not (root / relative).exists() and relative in OPTIONAL_SURFACES:
+            continue
         def replace_bare(text: str) -> str:
             return PEP440_RE.sub(pip_version, SEMVER_RE.sub(version, text))
 

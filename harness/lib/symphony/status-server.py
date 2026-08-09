@@ -47,6 +47,7 @@ import urllib.request
 from collections import deque
 from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from socketserver import TCPServer
 from pathlib import Path
 
 try:
@@ -14418,9 +14419,25 @@ def _find_port() -> int:
     raise RuntimeError("No available port in range 8765-8775")
 
 
+class StatusThreadingHTTPServer(ThreadingHTTPServer):
+    """HTTP server that does not reverse-resolve its numeric bind address.
+
+    ``HTTPServer.server_bind`` calls ``socket.getfqdn`` even though the status
+    server never uses the resulting hostname. On some macOS DNS setups that
+    lookup blocks startup for tens of seconds and exceeds desktop health-check
+    deadlines. Preserve TCPServer's bind behavior and publish the numeric host.
+    """
+
+    def server_bind(self) -> None:
+        TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name = str(host)
+        self.server_port = int(port)
+
+
 def main():
     port = _find_port()
-    server = ThreadingHTTPServer((BIND_HOST, port), StatusHandler)
+    server = StatusThreadingHTTPServer((BIND_HOST, port), StatusHandler)
     server.daemon_threads = True
     # Write port to pidfile directory so clients can discover it
     pid_dir = HARNESS_DIR / "run"

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "platform": "darwin-arm64",
+  "python": {
+    "series": "3.12",
+    "validated_version": "3.12.13",
+    "homebrew_formula": "python@3.12"
+  },
+  "node": {
+    "major": 22,
+    "validated_version": "22.23.2",
+    "homebrew_formula": "node@22"
+  },
+  "bun": {
+    "minimum_version": "1.3.0",
+    "validated_version": "1.3.8"
+  },
+  "codex": {
+    "minimum_version": "0.147.0",
+    "validated_version": "0.147.0"
+  },
+  "required_commands": [
+    "git",
+    "jq",
+    "tmux",
+    "bash",
+    "shellcheck",
+    "gitleaks",
+    "uv"
+  ]
+}

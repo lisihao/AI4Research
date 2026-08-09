@@ -11,7 +11,13 @@
 # desktop-build.yml (autotest), solar-ci, plus the privacy/whitespace checks.
 set -u
 repo="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$repo"
+cd "$repo" || exit 2
+node_prefix="$(brew --prefix node@22 2>/dev/null || true)"
+[ -z "$node_prefix" ] || export PATH="$node_prefix/bin:$PATH"
+python_prefix="$(brew --prefix python@3.12 2>/dev/null || true)"
+[ -z "$python_prefix" ] || export PATH="$python_prefix/libexec/bin:$PATH"
+python_bin="${SOLAR_PYTHON:-$repo/.venv/bin/python}"
+[ -x "$python_bin" ] || python_bin="$(command -v python3)"
 pass=0; fail=0; skip=0
 
 run() { # run <name> <cmd...>   (cmd exit: 0=PASS, 2=SKIP, other=FAIL)
@@ -25,7 +31,19 @@ run() { # run <name> <cmd...>   (cmd exit: 0=PASS, 2=SKIP, other=FAIL)
 
 dashboard_build() {
   [ -d harness/status-server/react-app/node_modules ] || { echo "(npm install in react-app first)"; return 2; }
-  ( cd harness/status-server/react-app && npm run typecheck && npm run build >/dev/null )
+  local build_dir rc
+  build_dir="$(mktemp -d "${TMPDIR:-/tmp}/ai4research-dashboard-build.XXXXXX")"
+  (
+    cd harness/status-server/react-app || exit 2
+    npm run typecheck && npm run build -- --outDir "$build_dir" --emptyOutDir >/dev/null
+  )
+  rc=$?
+  find "$build_dir" -depth -delete
+  return "$rc"
+}
+
+desktop_autotest() {
+  (cd desktop && PATH="$repo/.venv/bin:$PATH" bash autotest.sh)
 }
 
 # .ps1 files must be ASCII-only: Windows PowerShell 5.1 mangles non-ASCII (e.g. em-dashes) without a
@@ -58,10 +76,10 @@ run "ps1 ASCII-only (PS 5.1 safe)" ps1_ascii
 run "check-privacy"             bash scripts/check-privacy.sh
 run "check-daemons-render"      bash scripts/check-daemons-render.sh
 run "check-harness-plumbing"    bash scripts/check-harness-plumbing.sh
-run "status-server py_compile"  python3 -m py_compile harness/lib/symphony/status-server.py
+run "status-server py_compile"  "$python_bin" -m py_compile harness/lib/symphony/status-server.py
 run "dashboard typecheck+build" dashboard_build
 run "desktop main.js syntax"    node --check desktop/src/main.js
-run "desktop autotest"          bash -c 'cd desktop && bash autotest.sh'
+run "desktop autotest"          desktop_autotest
 
 if command -v shellcheck >/dev/null 2>&1; then
   run "shellcheck (installer shell)" shellcheck -S warning install.sh get-solar.sh lib/installer/*.sh

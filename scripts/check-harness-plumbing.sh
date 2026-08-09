@@ -43,7 +43,7 @@ PY
 )"
 echo "selected pane runtime: $selected_runtime"
 
-python3 "$home_dir/.solar/harness/tools/check_capsule_operator_bindings.py"
+HOME="$home_dir" python3 "$home_dir/.solar/harness/tools/check_capsule_operator_bindings.py"
 echo "stable capsule/operator bindings: coherent"
 
 fake_ok="$sandbox/fake-ok"
@@ -174,7 +174,7 @@ cat > "$envelope" <<'JSON'
 JSON
 
 submit_json="$sandbox/operator-submit.json"
-HARNESS_DIR="$home_dir/.solar/harness" SOLAR_OPERATORD_AUTO_KICK=0 \
+HOME="$home_dir" HARNESS_DIR="$home_dir/.solar/harness" SOLAR_OPERATORD_AUTO_KICK=0 \
   python3 "$home_dir/.solar/harness/lib/operator_runtime.py" submit --envelope "$envelope" > "$submit_json"
 
 inbox_path="$(python3 - "$submit_json" <<'PY'
@@ -187,7 +187,7 @@ PY
 )"
 [ -f "$inbox_path" ] || { echo "FAIL: operator inbox envelope missing: $inbox_path" >&2; exit 1; }
 
-result_path="$(HARNESS_DIR="$home_dir/.solar/harness" PYTHONPATH="$home_dir/.solar/harness/lib" python3 - <<'PY'
+result_path="$(HOME="$home_dir" HARNESS_DIR="$home_dir/.solar/harness" PYTHONPATH="$home_dir/.solar/harness/lib" python3 - <<'PY'
 from datetime import datetime, timezone
 import operator_runtime
 

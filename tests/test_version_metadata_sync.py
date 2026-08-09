@@ -45,3 +45,21 @@ def test_synchronize_updates_every_declared_surface(tmp_path: Path) -> None:
         tmp_path / "distribution/pipx/pyproject.toml"
     ).read_text()
     assert "v2.3.4-rc.5" in (tmp_path / "get-solar.sh").read_text()
+
+
+def test_owner_only_checklist_is_optional_in_public_cut(tmp_path: Path) -> None:
+    targets = {"VERSION", *MODULE.JSON_TARGETS, *MODULE.TAG_SURFACES}
+    targets.discard("docs/RELEASE-CHECKLIST.md")
+    targets.update(
+        {
+            "distribution/pipx/pyproject.toml",
+            "distribution/pipx/opensolar_cli/__init__.py",
+        }
+    )
+    for relative in targets:
+        source = REPO / relative
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+
+    assert MODULE.synchronize(tmp_path, write=False) == []

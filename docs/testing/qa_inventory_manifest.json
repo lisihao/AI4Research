@@ -1,7 +1,7 @@
 {
   "by_coverage_status": {
     "covered": 1503,
-    "missing-or-indirect": 124,
+    "missing-or-indirect": 127,
     "partial-or-unmapped": 19,
     "static-validation-required": 21
   },
@@ -20,7 +20,7 @@
     "Ingestion": 39,
     "Installer": 17,
     "Packaging": 14,
-    "QA Gates": 36,
+    "QA Gates": 39,
     "Reports": 13,
     "Repository": 91,
     "Research": 45,
@@ -38,11 +38,11 @@
     "python-cli": 1084,
     "route": 122,
     "shell-cli": 11,
-    "shell-script": 299,
+    "shell-script": 302,
     "skill": 73,
     "workflow": 23
   },
-  "feature_rows": 1667,
+  "feature_rows": 1670,
   "outputs": [
     "docs/testing/qa_feature_inventory.csv",
     "docs/testing/qa_feature_inventory.md",
@@ -51,6 +51,6 @@
     "docs/testing/qa_master_pass_fail_table.csv",
     "docs/testing/qa_master_pass_fail_table.md"
   ],
-  "test_files": 1101,
-  "tracked_files": 3944
+  "test_files": 1104,
+  "tracked_files": 3956
 }

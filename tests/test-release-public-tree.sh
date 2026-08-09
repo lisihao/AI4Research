@@ -10,9 +10,21 @@ trap 'rm -rf "$tmp"' EXIT
 fixture="$tmp/repo"
 git clone -q --no-local "$repo_dir" "$fixture"
 cp "$repo_dir/scripts/release-cut.sh" "$fixture/scripts/release-cut.sh"
+cp "$repo_dir/scripts/check-release-coherence.sh" "$fixture/scripts/check-release-coherence.sh"
+cp "$repo_dir/scripts/sync-version-metadata.py" "$fixture/scripts/sync-version-metadata.py"
 cp "$repo_dir/release-exclude.txt" "$fixture/release-exclude.txt"
+cp "$repo_dir/README.md" "$fixture/README.md"
 git -C "$fixture" config user.name "Solar release test"
 git -C "$fixture" config user.email "release-test@example.invalid"
+git -C "$fixture" add \
+    scripts/release-cut.sh \
+    scripts/check-release-coherence.sh \
+    scripts/sync-version-metadata.py \
+    release-exclude.txt \
+    README.md
+if ! git -C "$fixture" diff --cached --quiet; then
+    git -C "$fixture" commit -q -m "test fixture: current release tooling"
+fi
 
 mkdir -p "$tmp/bin"
 printf '%s\n' '#!/usr/bin/env sh' 'exit 0' >"$tmp/bin/gitleaks"

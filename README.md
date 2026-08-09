@@ -1001,4 +1001,4 @@ AI4Research/
 
 本项目使用 [MIT License](LICENSE)。
 
-Copyright © 2026 Sihao Li.
+Copyright © 2026 OpenJiuwen Solar contributors.

@@ -1,0 +1,6 @@
+-r harness.txt
+
+# Matches the Python dependency set used by the primary GitHub Actions gates.
+beautifulsoup4
+pytest
+requests

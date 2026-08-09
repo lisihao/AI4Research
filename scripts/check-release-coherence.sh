@@ -168,7 +168,7 @@ while IFS= read -r ref; do
         fail "referenced path does not exist: $ref"
         BAD_REF=1
     fi
-done < <(grep -rhoE '"?scripts/[A-Za-z0-9._-]+\.(sh|ts|py)"?' scripts/ \
+done < <(git grep -hoE '"?(harness/)?scripts/[A-Za-z0-9._-]+\.(sh|ts|py)"?' -- scripts \
     | tr -d '"' | sort -u)
 [ "$BAD_REF" -eq 0 ] && ok "all script references resolve"
 
