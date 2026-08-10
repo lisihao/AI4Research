@@ -104,57 +104,57 @@
       "owner": "Quality Engineer",
       "write_scope": ["scripts", ".github/workflows", "docs/development"],
       "acceptance": ["AC-03", "AC-05"],
-      "evidence": ["fast gate PASS: 185 pytest", "full gate PASS: PASS=9 FAIL=0 SKIP=2", "dashboard functional=9/9", "pre-push hook=.githooks"]
+      "evidence": ["fast gate PASS: 188 pytest", "full gate PASS: PASS=9 FAIL=0 SKIP=2", "dashboard functional=9/9", "pre-push hook=.githooks"]
     },
     {
       "id": "P3_MAC_MINI_BASELINE",
       "title": "Inventory and bootstrap Mac mini as a clean runner",
-      "status": "pending",
+      "status": "ok",
       "depends_on": ["P2_LOCAL_GATES"],
       "owner": "Mac mini/Ops",
       "write_scope": ["Mac mini ~/Services/AI4Research", "Mac mini ~/.solar"],
       "acceptance": ["runner preflight"],
-      "evidence": ["host inventory", "filesystem layout", "launchd status"]
+      "evidence": ["macOS=26.6.1", "arch=arm64", "Python=3.14.5", "Git=2.53.0", "Codex=0.147.0", "root=~/Services/AI4Research"]
     },
     {
       "id": "P3_RUNTIME_SERVICES",
       "title": "Install launchd-managed Solar runtime and loopback status service",
-      "status": "pending",
+      "status": "ok",
       "depends_on": ["P3_MAC_MINI_BASELINE"],
       "owner": "Mac mini/Ops",
       "write_scope": ["deploy", "templates/daemons", "Mac mini LaunchAgents"],
       "acceptance": ["service health"],
-      "evidence": ["launchctl print", "solar status", "status API health"]
+      "evidence": ["label=com.ai4research.solar.status-server", "bind=127.0.0.1:8875", "launchctl=ok", "healthz=ok"]
     },
     {
       "id": "P4_DEPLOY",
       "title": "Implement commit-addressed deployment manifest and atomic activation",
-      "status": "pending",
+      "status": "ok",
       "depends_on": ["P2_LOCAL_GATES", "P3_RUNTIME_SERVICES"],
       "owner": "Release Engineer",
       "write_scope": ["deploy", "scripts", "docs/deployment"],
       "acceptance": ["AC-06"],
-      "evidence": ["deployment manifest", "deployed SHA", "post-deploy smoke"]
+      "evidence": ["scripts/deploy-ai4research-mac-mini.sh", "release manifest=~/Services/AI4Research/current/.solar-release.json", "commit SHA and archive SHA-256 verified", "post-deploy healthz=ok"]
     },
     {
       "id": "P4_ROLLBACK",
       "title": "Prove automatic rollback to the previous SHA",
-      "status": "pending",
+      "status": "ok",
       "depends_on": ["P4_DEPLOY"],
       "owner": "Release Engineer",
       "write_scope": ["deploy", "Mac mini releases"],
       "acceptance": ["AC-06"],
-      "evidence": ["negative-control deployment", "rollback record", "restored health"]
+      "evidence": ["invalid synthetic release activation", "rollback_proven record under ~/Services/AI4Research/evidence/deployments", "restored launchd=ok", "restored healthz=ok"]
     },
     {
       "id": "P4_MONITOR",
       "title": "Expose read-only Mac mini health, task and evidence monitoring",
-      "status": "pending",
+      "status": "ok",
       "depends_on": ["P3_RUNTIME_SERVICES", "P4_DEPLOY"],
       "owner": "MacBook/Codex",
       "write_scope": ["monitor scripts", "status API contracts", "docs/operations"],
       "acceptance": ["AC-07"],
-      "evidence": ["SSH tunnel proof", "node/pane status snapshot", "evidence links"]
+      "evidence": ["scripts/ai4research-mac-mini-status.sh", "SSH tunnel 127.0.0.1:18875 -> Mac mini 127.0.0.1:8875", "token-free healthz=ok", "deployment evidence path exposed read-only"]
     },
     {
       "id": "P5_CODEX_REMOTE",

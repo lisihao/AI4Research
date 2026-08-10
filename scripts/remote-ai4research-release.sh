@@ -63,21 +63,35 @@ atomic_link() {
   local link_path="$2"
   local next_link="$root/.link-next.$$.${RANDOM}"
   ln -s "$relative_target" "$next_link"
-  mv -f "$next_link" "$link_path"
+  # BSD mv follows a destination symlink to a directory unless -h is used.
+  # Without -h the temporary link lands inside the old release and activation
+  # silently does not happen.
+  mv -h -f "$next_link" "$link_path"
+  [ "$(readlink "$link_path")" = "$relative_target" ] || {
+    echo "atomic link verification failed: $link_path" >&2
+    return 1
+  }
 }
 
 write_plist() {
   local plist_tmp="$plist.tmp.$$"
+  local template="$root/current/deploy/ai4research/com.ai4research.solar.status-server.plist.template"
+  [ -f "$template" ] || return 1
   mkdir -p "$root/config" "$root/logs" "$root/runtime-home" "$run_dir"
-  sed \
+  if ! sed \
     -e "s|__LABEL__|$label|g" \
     -e "s|__PYTHON__|$python_bin|g" \
     -e "s|__ROOT__|$root|g" \
     -e "s|__PORT__|$port|g" \
-    "$root/current/deploy/ai4research/com.ai4research.solar.status-server.plist.template" \
-    > "$plist_tmp"
-  plutil -lint "$plist_tmp" >/dev/null
-  mv -f "$plist_tmp" "$plist"
+    "$template" > "$plist_tmp"; then
+    [ ! -e "$plist_tmp" ] || unlink "$plist_tmp"
+    return 1
+  fi
+  if ! plutil -lint "$plist_tmp" >/dev/null; then
+    unlink "$plist_tmp"
+    return 1
+  fi
+  mv -f "$plist_tmp" "$plist" || return 1
 }
 
 clear_runtime_markers() {
@@ -87,11 +101,26 @@ clear_runtime_markers() {
 }
 
 restart_service() {
+  local bootstrapped=false
   launchctl bootout "$launch_domain/$label" >/dev/null 2>&1 || true
-  clear_runtime_markers
-  write_plist
-  launchctl bootstrap "$launch_domain" "$plist" >/dev/null
-  launchctl kickstart -k "$launch_domain/$label" >/dev/null
+  for _ in $(seq 1 20); do
+    if ! launchctl print "$launch_domain/$label" >/dev/null 2>&1; then
+      break
+    fi
+    sleep 0.25
+  done
+  launchctl print "$launch_domain/$label" >/dev/null 2>&1 && return 1
+  clear_runtime_markers || return 1
+  write_plist || return 1
+  for _ in $(seq 1 12); do
+    if launchctl bootstrap "$launch_domain" "$plist" >/dev/null 2>&1; then
+      bootstrapped=true
+      break
+    fi
+    sleep 0.5
+  done
+  [ "$bootstrapped" = true ] || return 1
+  launchctl kickstart -k "$launch_domain/$label" >/dev/null || return 1
 }
 
 wait_for_health() {

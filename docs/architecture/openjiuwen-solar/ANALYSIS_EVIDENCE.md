@@ -131,3 +131,21 @@ E2E 均已通过。React 与 Electron 的 `npm audit` 分别仍报告 4 个 high
 重同步还暴露并修复了三类主干漂移：测试统一迁到 `tests/harness/` 后的旧路径引用；
 task graph 规格与 runtime sidecar 分离后的过期状态断言；连续 desktop gate 未等待前一个
 status-server 完成退出所产生的健康检查竞态。修复后由同一全量命令重新验证，不使用失败项跳过。
+
+## 11. Mac mini 固定 SHA 部署与回滚（2026-08-10）
+
+| 检查 | 结果 | 状态 |
+|---|---|---|
+| 独立根目录 | `~/Services/AI4Research`，未使用既有 `~/.solar` 或其他项目目录 | ok |
+| Release contract | 完整 commit SHA + archive SHA-256 + `.solar-release.json` | ok |
+| 原子激活 | `current -> releases/<sha>`，切换后 `readlink` 强制复核 | ok |
+| launchd | `com.ai4research.solar.status-server`，`gui/501` | ok |
+| 网络边界 | Mac mini 仅 `127.0.0.1:8875`；MacBook 经 SSH 转发到 `127.0.0.1:18875` | ok |
+| 免 token 访问 | tunnel、dashboard 与 `/healthz` 可从 MacBook 访问 | ok |
+| 负向回滚 | 无效 synthetic release 健康失败；恢复原 SHA 后 launchd/health 均为 ok | ok |
+| 运行证据 | `~/Services/AI4Research/evidence/deployments/*.json` | ok |
+
+首次负向演练发现两个真实的 macOS 语义问题：launchd `bootout`/`bootstrap` 需要等待与重试；
+BSD `mv` 默认会跟随指向目录的目标符号链接。实现已增加 job 消失确认、bootstrap 重试、
+`mv -h` 和切换后的 `readlink` 校验。失败演练产生的 4 个临时链接已按精确路径清理，
+未删除源码、发布版本或运行数据；修复后的负向演练产生 `rollback_proven` 证据。
