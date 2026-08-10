@@ -28,6 +28,9 @@ regexes = [
   # AutoSci run IDs and evidence slugs such as task-ask-smoke-* and
   # codex-ask-no_matching_open_questions are not provider credentials.
   '''sk-(?:autosci|route|source|smoke|no_matching_open_questions|semantic|model|provider|wiki|target|context)[A-Za-z0-9_-]*''',
+  # Historical AutoSci scheduler task IDs embedded in reconciliation paths.
+  # The exact semantic prefix and 12-character run suffix keep this narrow.
+  '''sk-info-smoke-research-scheduler-[A-Za-z0-9_]{12}''',
   '''your-api-key-here''',
   '''your-session-token''',
 ]

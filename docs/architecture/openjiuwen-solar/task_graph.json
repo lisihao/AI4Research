@@ -1,0 +1,270 @@
+{
+  "schema_version": "solar.program-task-graph.v1",
+  "program_id": "openjiuwen-solar-mainline-adoption",
+  "generated_at": "2026-08-10T15:00:00-04:00",
+  "mainline": {
+    "repository": "https://github.com/Stellven/AI4Research.git",
+    "branch": "openJiuwen-Solar",
+    "baseline_sha": "7c7e769a03a1ea80b3f80551352b3354e400cdbd"
+  },
+  "portfolio": {
+    "solar_main": "Stellven/AI4Research#openJiuwen-Solar",
+    "insight_product": "<user-fork>/GenesisPod",
+    "feature_source": "<user-fork>/solar-harness",
+    "development_host": "MacBook",
+    "runtime_host": "Mac mini"
+  },
+  "status_legend": {
+    "ok": "completed with evidence",
+    "pending": "planned and ready when dependencies pass",
+    "warn": "completed or inspected with a non-blocking gap",
+    "error": "blocked by a failing requirement",
+    "hold": "must not start until an explicit user release"
+  },
+  "nodes": [
+    {
+      "id": "P0_CLONE",
+      "title": "Clone openJiuwen-Solar in an isolated directory",
+      "status": "ok",
+      "depends_on": [],
+      "owner": "MacBook/Codex",
+      "write_scope": ["/Users/sihaoli/Projects/AI4Research"],
+      "acceptance": ["AC-01"],
+      "evidence": [
+        "mainline_branch=openJiuwen-Solar",
+        "mainline_sha=7c7e769a03a1ea80b3f80551352b3354e400cdbd",
+        "work_branch=codex/openjiuwen-bootstrap-sync-20260810"
+      ]
+    },
+    {
+      "id": "P0_ARCH",
+      "title": "Create PRD, contract, architecture, ADRs and task graph",
+      "status": "ok",
+      "depends_on": ["P0_CLONE"],
+      "owner": "MacBook/Codex",
+      "write_scope": ["docs/architecture/openjiuwen-solar"],
+      "acceptance": ["AC-02"],
+      "evidence": ["docs/architecture/openjiuwen-solar/"]
+    },
+    {
+      "id": "P1_HYGIENE_INVENTORY",
+      "title": "Classify tracked source, fixtures, runtime artifacts and binaries",
+      "status": "ok",
+      "depends_on": ["P0_ARCH"],
+      "owner": "Repository Maintainer",
+      "write_scope": ["docs/repository-hygiene", ".gitignore", ".gitattributes"],
+      "acceptance": ["AC-04"],
+      "evidence": ["docs/repository-hygiene/cleanup-manifest.json", "commit=030e8b436", "source_commit=d0cc750b"]
+    },
+    {
+      "id": "P1_FORWARD_CLEANUP",
+      "title": "Remove runtime artifacts from the tip and externalize large assets",
+      "status": "ok",
+      "depends_on": ["P1_HYGIENE_INVENTORY"],
+      "owner": "Repository Maintainer",
+      "write_scope": ["harness/artifacts", "Feature list stuff", "docs/testing", "release-exclude.txt"],
+      "acceptance": ["AC-04"],
+      "evidence": ["1838 tracked paths removed", "430805072 checkout bytes removed", "baseline recovery SHA=4d60f1e0"]
+    },
+    {
+      "id": "P1_PRIVACY",
+      "title": "Resolve privacy scanner findings and define public identity policy",
+      "status": "ok",
+      "depends_on": ["P1_HYGIENE_INVENTORY"],
+      "owner": "Repository Maintainer",
+      "write_scope": ["scripts/check-privacy.sh", "Feature list stuff", "docs"],
+      "acceptance": ["privacy scan exit 0"],
+      "evidence": ["check-privacy PASS", "check-privacy --self-test PASS", "gitleaks no leaks"]
+    },
+    {
+      "id": "P1_VERSION",
+      "title": "Make VERSION the generated release metadata source",
+      "status": "ok",
+      "depends_on": ["P0_ARCH"],
+      "owner": "Release Engineer",
+      "write_scope": ["VERSION", "package.json", "desktop", "distribution", "scripts/check-release-coherence.sh"],
+      "acceptance": ["AC-05"],
+      "evidence": ["release-coherence PASS", "version metadata tests 2 passed", "VERSION=1.0.0-rc.9"]
+    },
+    {
+      "id": "P2_MACBOOK_TOOLCHAIN",
+      "title": "Bootstrap reproducible MacBook toolchain",
+      "status": "ok",
+      "depends_on": ["P0_ARCH"],
+      "owner": "MacBook/Codex",
+      "write_scope": ["toolchain manifest", "bootstrap scripts", "developer docs"],
+      "acceptance": ["AC-03"],
+      "evidence": ["Python=3.12.13", "Node=22.23.2", "Bun=1.3.8", "Codex=0.147.0", "codex doctor overallStatus=ok"]
+    },
+    {
+      "id": "P2_LOCAL_GATES",
+      "title": "Define fast, pre-push and full local gates",
+      "status": "ok",
+      "depends_on": ["P2_MACBOOK_TOOLCHAIN", "P1_PRIVACY", "P1_VERSION"],
+      "owner": "Quality Engineer",
+      "write_scope": ["scripts", ".github/workflows", "docs/development"],
+      "acceptance": ["AC-03", "AC-05"],
+      "evidence": ["fast gate PASS: 185 pytest", "full gate PASS: PASS=9 FAIL=0 SKIP=2", "dashboard functional=9/9", "pre-push hook=.githooks"]
+    },
+    {
+      "id": "P3_MAC_MINI_BASELINE",
+      "title": "Inventory and bootstrap Mac mini as a clean runner",
+      "status": "pending",
+      "depends_on": ["P2_LOCAL_GATES"],
+      "owner": "Mac mini/Ops",
+      "write_scope": ["Mac mini ~/Services/AI4Research", "Mac mini ~/.solar"],
+      "acceptance": ["runner preflight"],
+      "evidence": ["host inventory", "filesystem layout", "launchd status"]
+    },
+    {
+      "id": "P3_RUNTIME_SERVICES",
+      "title": "Install launchd-managed Solar runtime and loopback status service",
+      "status": "pending",
+      "depends_on": ["P3_MAC_MINI_BASELINE"],
+      "owner": "Mac mini/Ops",
+      "write_scope": ["deploy", "templates/daemons", "Mac mini LaunchAgents"],
+      "acceptance": ["service health"],
+      "evidence": ["launchctl print", "solar status", "status API health"]
+    },
+    {
+      "id": "P4_DEPLOY",
+      "title": "Implement commit-addressed deployment manifest and atomic activation",
+      "status": "pending",
+      "depends_on": ["P2_LOCAL_GATES", "P3_RUNTIME_SERVICES"],
+      "owner": "Release Engineer",
+      "write_scope": ["deploy", "scripts", "docs/deployment"],
+      "acceptance": ["AC-06"],
+      "evidence": ["deployment manifest", "deployed SHA", "post-deploy smoke"]
+    },
+    {
+      "id": "P4_ROLLBACK",
+      "title": "Prove automatic rollback to the previous SHA",
+      "status": "pending",
+      "depends_on": ["P4_DEPLOY"],
+      "owner": "Release Engineer",
+      "write_scope": ["deploy", "Mac mini releases"],
+      "acceptance": ["AC-06"],
+      "evidence": ["negative-control deployment", "rollback record", "restored health"]
+    },
+    {
+      "id": "P4_MONITOR",
+      "title": "Expose read-only Mac mini health, task and evidence monitoring",
+      "status": "pending",
+      "depends_on": ["P3_RUNTIME_SERVICES", "P4_DEPLOY"],
+      "owner": "MacBook/Codex",
+      "write_scope": ["monitor scripts", "status API contracts", "docs/operations"],
+      "acceptance": ["AC-07"],
+      "evidence": ["SSH tunnel proof", "node/pane status snapshot", "evidence links"]
+    },
+    {
+      "id": "P5_CODEX_REMOTE",
+      "title": "Evaluate Codex remote-control as an SSH-tunneled auxiliary channel",
+      "status": "pending",
+      "depends_on": ["P4_MONITOR"],
+      "owner": "MacBook/Codex",
+      "write_scope": ["Codex host config", "docs/operations"],
+      "acceptance": ["AC-07"],
+      "evidence": ["token auth proof", "workspace allowlist proof", "SSH fallback proof"]
+    },
+    {
+      "id": "P6_PHASE1_SOURCE_RELEASE",
+      "title": "Release already-pushed solar-harness features for read-only inventory",
+      "status": "ok",
+      "depends_on": ["P0_ARCH"],
+      "owner": "User",
+      "write_scope": [],
+      "acceptance": ["AC-08"],
+      "evidence": ["explicit user direction on 2026-08-10", "scope=already-pushed features only"]
+    },
+    {
+      "id": "P6_HARNESS_INVENTORY",
+      "title": "Pin pushed source SHA and produce destination-aware feature import manifest",
+      "status": "pending",
+      "depends_on": ["P6_PHASE1_SOURCE_RELEASE", "P2_LOCAL_GATES"],
+      "owner": "Migration Engineer",
+      "write_scope": ["migration manifest only"],
+      "acceptance": ["AC-09"],
+      "evidence": ["source SHA", "feature classification", "destination=AI4Research|GenesisPod", "path and contract map"]
+    },
+    {
+      "id": "P6_AI4RESEARCH_IMPORTS",
+      "title": "Import approved runtime, Harness, agent and research features into AI4Research one by one",
+      "status": "pending",
+      "depends_on": ["P6_HARNESS_INVENTORY", "P4_ROLLBACK"],
+      "owner": "Migration Engineer",
+      "write_scope": ["per-feature branches defined by import manifest"],
+      "acceptance": ["AC-09"],
+      "evidence": ["contract test", "regression test", "PR", "rollback note"]
+    },
+    {
+      "id": "P6_GENESISPOD_BASELINE",
+      "title": "Establish <user-fork>/GenesisPod as an independent development and deployment target",
+      "status": "pending",
+      "depends_on": ["P6_PHASE1_SOURCE_RELEASE"],
+      "owner": "MacBook/Codex",
+      "write_scope": ["independent GenesisPod workspace", "Mac mini ~/Services/GenesisPod"],
+      "acceptance": ["AC-10"],
+      "evidence": ["repository remote and SHA", "independent runtime paths", "health and rollback contract"]
+    },
+    {
+      "id": "P6_GENESISPOD_INSIGHT_INVENTORY",
+      "title": "Map creator, Hugging Face, GitHub and YouTube insight features to GenesisPod",
+      "status": "pending",
+      "depends_on": ["P6_HARNESS_INVENTORY", "P6_GENESISPOD_BASELINE"],
+      "owner": "GenesisPod Migration Engineer",
+      "write_scope": ["GenesisPod migration manifest only"],
+      "acceptance": ["AC-09", "AC-10"],
+      "evidence": ["source SHA", "GenesisPod domain/API/storage/UI mapping", "test plan"]
+    },
+    {
+      "id": "P6_GENESISPOD_IMPORTS",
+      "title": "Implement and merge approved insight features into GenesisPod one by one",
+      "status": "pending",
+      "depends_on": ["P6_GENESISPOD_INSIGHT_INVENTORY"],
+      "owner": "GenesisPod Migration Engineer",
+      "write_scope": ["per-feature GenesisPod branches"],
+      "acceptance": ["AC-09", "AC-10"],
+      "evidence": ["contract test", "product regression", "PR", "Mac mini deployment and rollback"]
+    },
+    {
+      "id": "P7_UNFINISHED_CANDIDATES",
+      "title": "Inventory unfinished solar-harness features developed from 2026-05-20 through 2026-07-20",
+      "status": "pending",
+      "depends_on": ["P6_HARNESS_INVENTORY"],
+      "owner": "Migration Engineer",
+      "write_scope": ["phase-2 candidate manifest only"],
+      "acceptance": ["AC-08", "AC-09"],
+      "evidence": ["time-bounded candidate list", "completion and duplication assessment"]
+    },
+    {
+      "id": "P7_FEATURE_SELECTION",
+      "title": "Select one unfinished feature for product development",
+      "status": "hold",
+      "depends_on": ["P7_UNFINISHED_CANDIDATES"],
+      "owner": "User/Product",
+      "write_scope": [],
+      "acceptance": ["explicit per-feature selection"],
+      "evidence": ["selected feature ID", "target repository", "acceptance contract"]
+    },
+    {
+      "id": "P7_FEATURE_IMPORTS",
+      "title": "Develop, test and merge selected unfinished features one by one",
+      "status": "hold",
+      "depends_on": ["P7_FEATURE_SELECTION", "P4_ROLLBACK"],
+      "owner": "Feature Team",
+      "write_scope": ["one selected feature branch at a time"],
+      "acceptance": ["AC-09"],
+      "evidence": ["implementation", "full tests", "PR", "deployment", "rollback"]
+    },
+    {
+      "id": "P8_CONVERGENCE_REVIEW",
+      "title": "Review Harness/Core convergence after operational baselines stabilize",
+      "status": "pending",
+      "depends_on": ["P4_ROLLBACK", "P5_CODEX_REMOTE"],
+      "owner": "Architect",
+      "write_scope": ["docs/architecture", "parity tests"],
+      "acceptance": ["new ADR"],
+      "evidence": ["parity matrix", "ownership map", "revisit decision"]
+    }
+  ]
+}
