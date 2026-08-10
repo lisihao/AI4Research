@@ -57,6 +57,8 @@ git archive --format=tar "$full_sha" | gzip -n > "$archive"
 archive_sha="$(shasum -a 256 "$archive" | awk '{print $1}')"
 
 ssh -o BatchMode=yes "$host" "mkdir -p '$remote_root/incoming'"
-scp -q "$archive" "$host:$remote_root/incoming/$full_sha.tar.gz"
+ssh -o BatchMode=yes "$host" \
+  "umask 077; /bin/cat > '$remote_root/incoming/$full_sha.tar.gz'" \
+  < "$archive"
 ssh -o BatchMode=yes "$host" bash -s -- deploy "$remote_root" "$full_sha" "$archive_sha" "$port" \
   < "$repo/scripts/remote-ai4research-release.sh"
