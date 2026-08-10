@@ -105,7 +105,7 @@ E2E 均已通过。React 与 Electron 的 `npm audit` 分别仍报告 4 个 high
 
 | 检查 | 结果 | 状态 |
 |---|---|---|
-| GitHub 主干 | `origin/openJiuwen-Solar=7c7e769a03a1ea80b3f80551352b3354e400cdbd` | ok |
+| GitHub 主干 | `origin/openJiuwen-Solar=5cccc0b495cad52b473ad751d7822cfdbb77665d` | ok |
 | 上游变化 | 相对旧开发分支新增 148 个提交 | warn |
 | 安全快照 | 9 个规划文件 SHA-256 + `stash@{0}`；旧分支保留 | ok |
 | 同步分支 | `codex/openjiuwen-bootstrap-sync-20260810` | ok |
@@ -120,7 +120,7 @@ E2E 均已通过。React 与 Electron 的 `npm audit` 分别仍报告 4 个 high
 
 | 检查 | 结果 | 状态 |
 |---|---|---|
-| Fast gate | `188 passed`；privacy、Gitleaks、release、core import、installer/harness plumbing 全部通过 | ok |
+| Fast gate | `189 passed`；privacy、Gitleaks、release、core import、installer/harness plumbing 全部通过 | ok |
 | Full gate | `PASS=9 FAIL=0 SKIP=2`；`AI4Research full local gate: PASS` | ok |
 | Dashboard | headless render PASS；真实 backend functional E2E `9/9 passed` | ok |
 | Desktop 平台项 | 当前会话无 display/xvfb，两个 Electron 可视项未验证 | pending |

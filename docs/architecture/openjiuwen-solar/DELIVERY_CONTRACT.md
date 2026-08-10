@@ -8,7 +8,7 @@
 
 - 目标仓：`https://github.com/Stellven/AI4Research.git`
 - 目标分支：`openJiuwen-Solar`
-- 当前同步基线 SHA：`7c7e769a03a1ea80b3f80551352b3354e400cdbd`
+- 当前同步基线 SHA：`5cccc0b495cad52b473ad751d7822cfdbb77665d`
 - 第二目标仓：`<user-fork>/GenesisPod`（独立项目；真实 remote 仅存本机 Git 配置）
 - 特性来源仓：`<user-fork>/solar-harness`（第一阶段已推送部分已释放；未完成部分逐项门禁）
 - 设备边界：MacBook 开发与控制；Mac mini 独立运行 AI4Research 与 GenesisPod

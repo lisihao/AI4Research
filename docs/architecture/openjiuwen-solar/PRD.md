@@ -25,7 +25,7 @@ Solar 后续开发以 `Stellven/AI4Research` 的 `openJiuwen-Solar` 分支为唯
 
 | 项目 | 当前事实 | 影响 |
 |---|---|---|
-| 主干分支 | `openJiuwen-Solar`，同步基线 `7c7e769a03a1ea80b3f80551352b3354e400cdbd` | 后续变更以此为基线 |
+| 主干分支 | `openJiuwen-Solar`，同步基线 `5cccc0b495cad52b473ad751d7822cfdbb77665d` | 后续变更以此为基线 |
 | 与 `main` 关系 | `main` 0 个独有提交，目标分支领先 425 个提交 | `openJiuwen-Solar` 已是事实产品主线 |
 | 主运行时 | `harness/` Bash/Python | 新功能优先沿此路径演进 |
 | 可选运行时 | `core/` Bun/TypeScript | 只能通过已定义契约演进，不另建事实源 |

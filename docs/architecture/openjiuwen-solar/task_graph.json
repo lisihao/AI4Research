@@ -5,7 +5,7 @@
   "mainline": {
     "repository": "https://github.com/Stellven/AI4Research.git",
     "branch": "openJiuwen-Solar",
-    "baseline_sha": "7c7e769a03a1ea80b3f80551352b3354e400cdbd"
+    "baseline_sha": "5cccc0b495cad52b473ad751d7822cfdbb77665d"
   },
   "portfolio": {
     "solar_main": "Stellven/AI4Research#openJiuwen-Solar",
@@ -32,7 +32,7 @@
       "acceptance": ["AC-01"],
       "evidence": [
         "mainline_branch=openJiuwen-Solar",
-        "mainline_sha=7c7e769a03a1ea80b3f80551352b3354e400cdbd",
+        "mainline_sha=5cccc0b495cad52b473ad751d7822cfdbb77665d",
         "work_branch=codex/openjiuwen-bootstrap-sync-20260810"
       ]
     },
