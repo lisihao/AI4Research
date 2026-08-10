@@ -16,6 +16,9 @@
 set -u
 cd "$(dirname "$0")"
 export HARNESS_DIR="${HARNESS_DIR:-$(cd .. && pwd)/harness}"
+# The desktop package owns Playwright. Tests were consolidated under ../tests,
+# so expose the desktop dependency root to Node's module resolver.
+export NODE_PATH="$PWD/node_modules${NODE_PATH:+:$NODE_PATH}"
 echo "== Solar desktop autotest =="
 echo "HARNESS_DIR=$HARNESS_DIR"
 fail=0

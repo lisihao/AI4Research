@@ -790,7 +790,7 @@ def test_builder_pool_snapshot_separates_provider_policy_capacity(monkeypatch):
     }
 
 
-def test_drain_builder_ready_submits_and_marks_graph(monkeypatch, tmp_path):
+def test_drain_builder_ready_submits_and_marks_runtime_state(monkeypatch, tmp_path):
     pm_dispatch = _load_pm_dispatch()
     sprints = tmp_path / "sprints"
     inbox = tmp_path / "run" / "pm-inbox"
@@ -822,6 +822,12 @@ def test_drain_builder_ready_submits_and_marks_graph(monkeypatch, tmp_path):
 
     assert rc == 0
     graph = json.loads((sprints / "sprint-drain.task_graph.json").read_text(encoding="utf-8"))
-    assert graph["nodes"][0]["status"] == "dispatched"
-    assert graph["nodes"][0]["dispatched_via"] == "pm_dispatch"
-    assert graph["nodes"][0]["pm_task_id"] == "pm-sprint-drain-B1-test"
+    # Runtime status belongs in the sidecar; the task graph remains a stable spec.
+    assert "status" not in graph["nodes"][0]
+    assert graph["nodes"][0]["execution_attempt"]["source"] == "pm_dispatch"
+
+    state = json.loads((sprints / "sprint-drain.task_dag.state.json").read_text(encoding="utf-8"))
+    result = state["node_results"]["B1"]
+    assert result["status"] == "dispatched"
+    assert result["dispatched_via"] == "pm_dispatch"
+    assert result["pm_task_id"] == "pm-sprint-drain-B1-test"

@@ -52,6 +52,27 @@ function waitHealthy(timeoutMs) {
   });
 }
 
+function stopBackend(child) {
+  return new Promise((resolve) => {
+    if (child.exitCode !== null || child.signalCode !== null) {
+      resolve();
+      return;
+    }
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(forceTimer);
+      clearTimeout(giveUpTimer);
+      resolve();
+    };
+    const forceTimer = setTimeout(() => child.kill("SIGKILL"), 2500);
+    const giveUpTimer = setTimeout(finish, 3500);
+    child.once("exit", finish);
+    if (!child.kill("SIGTERM")) finish();
+  });
+}
+
 (async () => {
   if (!fs.existsSync(STATUS_SERVER)) {
     console.log("GATE FAIL: status-server not found at", STATUS_SERVER);
@@ -64,7 +85,15 @@ function waitHealthy(timeoutMs) {
   const backend = spawn(PYTHON, [STATUS_SERVER], {
     cwd: HARNESS_DIR,
     env: { ...process.env, HARNESS_DIR },
-    stdio: ["ignore", "ignore", "ignore"],
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let backendStdout = "";
+  let backendStderr = "";
+  backend.stdout.on("data", (chunk) => {
+    backendStdout = `${backendStdout}${chunk}`.slice(-4000);
+  });
+  backend.stderr.on("data", (chunk) => {
+    backendStderr = `${backendStderr}${chunk}`.slice(-4000);
   });
 
   let pass = false;
@@ -90,10 +119,13 @@ function waitHealthy(timeoutMs) {
     pass = found.length === MUST_CONTAIN.length;
   } catch (e) {
     console.log("GATE FAIL:", e.message);
+    console.log(
+      `backend-exit=${backend.exitCode ?? "running"} signal=${backend.signalCode ?? "N/A"}`,
+    );
+    if (backendStdout.trim()) console.log("backend-stdout:", backendStdout.trim());
+    if (backendStderr.trim()) console.log("backend-stderr:", backendStderr.trim());
   } finally {
-    try {
-      backend.kill();
-    } catch {}
+    await stopBackend(backend);
   }
 
   console.log(

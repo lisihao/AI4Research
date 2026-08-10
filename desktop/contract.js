@@ -59,6 +59,27 @@ function waitHealthy(timeoutMs) {
   });
 }
 
+function stopBackend(child) {
+  return new Promise((resolve) => {
+    if (child.exitCode !== null || child.signalCode !== null) {
+      resolve();
+      return;
+    }
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(forceTimer);
+      clearTimeout(giveUpTimer);
+      resolve();
+    };
+    const forceTimer = setTimeout(() => child.kill("SIGKILL"), 2500);
+    const giveUpTimer = setTimeout(finish, 3500);
+    child.once("exit", finish);
+    if (!child.kill("SIGTERM")) finish();
+  });
+}
+
 const CHECKS = [
   {
     name: "GET /healthz == 200",
@@ -128,9 +149,7 @@ const CHECKS = [
   } catch (e) {
     console.log("CONTRACT FAIL:", e.message);
   } finally {
-    try {
-      backend.kill();
-    } catch {}
+    await stopBackend(backend);
   }
   console.log(allPass ? "CONTRACT PASS" : "CONTRACT FAIL");
   process.exit(allPass ? 0 : 1);

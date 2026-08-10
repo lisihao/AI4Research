@@ -42,14 +42,14 @@ bash scripts/check-harness-plumbing.sh
 SOLAR_GRAPH_BUILDER_OPERATOR_POOL=0 "$python_bin" -m pytest -q \
     tests/test_version_metadata_sync.py \
     harness/tests/test_status_server_fast_bind.py \
-    harness/tests/graph/test_pm_inbox_closeout_reconcile.py \
-    harness/tests/graph/test_graph_status_sync.py \
-    harness/tests/graph/test_parent_ready_closeout.py \
-    harness/tests/graph/test_task_graph_state_io.py \
-    harness/tests/graph/test_graph_dispatch_lease_busy.py \
-    harness/tests/graph/test_graph_dispatch_submit.py \
-    harness/tests/graph/test_worker_assignment_reasons.py \
-    harness/tests/test_eval_verdict_evidence_gate_wiring.py \
-    harness/tests/test_pm_dispatch.py
+    tests/harness/graph/test_pm_inbox_closeout_reconcile.py \
+    tests/harness/graph/test_graph_status_sync.py \
+    tests/harness/graph/test_parent_ready_closeout.py \
+    tests/harness/graph/test_task_graph_state_io.py \
+    tests/harness/graph/test_graph_dispatch_lease_busy.py \
+    tests/harness/graph/test_graph_dispatch_submit.py \
+    tests/harness/graph/test_worker_assignment_reasons.py \
+    tests/harness/test_eval_verdict_evidence_gate_wiring.py \
+    tests/harness/test_pm_dispatch.py
 
 echo "AI4Research fast local gate: PASS"

@@ -157,7 +157,24 @@ if grep -qE '全部通过|verified-live|live [[:alpha:]]+ status: (verified|ok)(
 fi
 echo "solar-harness status auth/quota boundary: ok"
 
-HARNESS_DIR="$home_dir/.solar/harness" bash "$home_dir/.solar/tests/harness/test_dispatch_ledger.sh" >/dev/null
+(
+  HARNESS_DIR="$home_dir/.solar/harness"
+  # The historical end-to-end shell test is intentionally quarantined in the
+  # source tree and is not part of an installed runtime. Keep this installer
+  # smoke self-contained and write only beneath the current sandbox.
+  . "$HARNESS_DIR/lib/dispatch-ledger.sh"
+  . "$HARNESS_DIR/lib/queue.sh"
+  ledger_smoke_dir="$sandbox/dispatch-ledger-smoke"
+  DISPATCH_LEDGER_FILE="$ledger_smoke_dir/dispatch-ledger.jsonl"
+  _QUEUE_DIR="$ledger_smoke_dir/queue"
+  mkdir -p "$_QUEUE_DIR"
+
+  dispatch_id="$(new_dispatch_id)"
+  dispatch_ledger_append "attempted" "sprint-plumbing-smoke" "pane:0.1" "$dispatch_id" '{}'
+  grep -q "\"dispatch_id\": \"$dispatch_id\"" "$DISPATCH_LEDGER_FILE"
+  [ "$(queue_enqueue "sprint-plumbing-smoke" "plumbing smoke intent")" = "ok" ]
+  queue_peek "sprint-plumbing-smoke" | grep -q "plumbing smoke intent"
+)
 echo "dispatch ledger/queue plumbing: ok"
 
 envelope="$sandbox/no-llm-envelope.json"
