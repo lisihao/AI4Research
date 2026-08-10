@@ -34,6 +34,7 @@ esac
 }
 
 label="com.ai4research.solar.status-server"
+user_home="${root%/Services/AI4Research}"
 uid="$(id -u)"
 if launchctl print "gui/$uid" >/dev/null 2>&1; then
   launch_domain="gui/$uid"
@@ -82,6 +83,7 @@ write_plist() {
     -e "s|__LABEL__|$label|g" \
     -e "s|__PYTHON__|$python_bin|g" \
     -e "s|__ROOT__|$root|g" \
+    -e "s|__USER_HOME__|$user_home|g" \
     -e "s|__PORT__|$port|g" \
     "$template" > "$plist_tmp"; then
     [ ! -e "$plist_tmp" ] || unlink "$plist_tmp"

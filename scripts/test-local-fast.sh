@@ -41,6 +41,8 @@ bash scripts/check-harness-plumbing.sh
 
 SOLAR_GRAPH_BUILDER_OPERATOR_POOL=0 "$python_bin" -m pytest -q \
     tests/test_version_metadata_sync.py \
+    tests/test_ai4research_deployment_contract.py \
+    tests/vertical/account_management/test_authentication_session_security_env_gated.py \
     harness/tests/test_status_server_fast_bind.py \
     tests/harness/graph/test_pm_inbox_closeout_reconcile.py \
     tests/harness/graph/test_graph_status_sync.py \

@@ -20,10 +20,11 @@ _os() {
 }
 
 HOME_DIR="${HOME}"
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME_DIR/.codex}"
 SECRETS_ENV="${SOLAR_SECRETS_ENV:-$HOME_DIR/.solar/secrets/solar-user-secrets.env}"
 
 _codex_state() {
-  if [ -s "$HOME_DIR/.codex/auth.json" ]; then echo ok
+  if [ -s "$CODEX_HOME_DIR/auth.json" ]; then echo ok
   elif command -v codex >/dev/null 2>&1; then echo unauth
   else echo missing-cli; fi
 }
@@ -43,7 +44,7 @@ cmd_status() {
   codex="$(_codex_state)"; claude="$(_claude_state)"; glm="$(_glm_state)"
   printf '{"ok":true,"codex":"%s","claude":"%s","glm":"%s","detail":{"codex_auth_json":%s,"claude_credentials":%s,"claude_oauth_env":%s},"source":"auth-helpers"}\n' \
     "$codex" "$claude" "$glm" \
-    "$(_b "$([ -s "$HOME_DIR/.codex/auth.json" ] && echo x)")" \
+    "$(_b "$([ -s "$CODEX_HOME_DIR/auth.json" ] && echo x)")" \
     "$(_b "$([ -s "$HOME_DIR/.claude/.credentials.json" ] && echo x)")" \
     "$(_b "${CLAUDE_CODE_OAUTH_TOKEN:-}")"
 }
@@ -67,9 +68,9 @@ cmd_reuse_host_creds() {
     for wu in /mnt/c/Users/*/; do
       base="$(basename "$wu")"
       case "$base" in Public|Default|"Default User"|All*) continue ;; esac
-      if [ "$provider" = "codex" ] && [ -s "${wu}.codex/auth.json" ] && [ ! -s "$HOME_DIR/.codex/auth.json" ]; then
-        mkdir -p "$HOME_DIR/.codex"; cp "${wu}.codex/auth.json" "$HOME_DIR/.codex/auth.json"
-        chmod 600 "$HOME_DIR/.codex/auth.json"; copied=true; break
+      if [ "$provider" = "codex" ] && [ -s "${wu}.codex/auth.json" ] && [ ! -s "$CODEX_HOME_DIR/auth.json" ]; then
+        mkdir -p "$CODEX_HOME_DIR"; cp "${wu}.codex/auth.json" "$CODEX_HOME_DIR/auth.json"
+        chmod 600 "$CODEX_HOME_DIR/auth.json"; copied=true; break
       fi
       if [ "$provider" = "claude" ] && [ -s "${wu}.claude/.credentials.json" ] && [ ! -s "$HOME_DIR/.claude/.credentials.json" ]; then
         mkdir -p "$HOME_DIR/.claude"; cp "${wu}.claude/.credentials.json" "$HOME_DIR/.claude/.credentials.json"

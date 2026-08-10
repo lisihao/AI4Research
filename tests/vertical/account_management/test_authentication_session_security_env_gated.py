@@ -65,6 +65,39 @@ def test_authentication_session_security_provider_authenticated_live_status() ->
     assert "api_key" not in payload
 
 
+def test_authentication_session_security_respects_explicit_codex_home(
+    tmp_path: Path,
+) -> None:
+    bash = _bash_executable()
+    if not bash:
+        pytest.skip("A bash runtime is required to execute harness/auth-helpers.sh status.")
+    runtime_home = tmp_path / "runtime-home"
+    codex_home = tmp_path / "host-codex-home"
+    runtime_home.mkdir()
+    codex_home.mkdir()
+    (codex_home / "auth.json").write_text('{"fixture":true}\n', encoding="utf-8")
+
+    env = os.environ.copy()
+    env.update({"HOME": str(runtime_home), "CODEX_HOME": str(codex_home)})
+    completed = subprocess.run(
+        [bash, str(AUTH_HELPER), "status"],
+        cwd=REPO,
+        env=env,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        timeout=15,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert payload["codex"] == "ok"
+    assert payload["detail"]["codex_auth_json"] is True
+    assert not (runtime_home / ".codex").exists()
+
+
 class _FakeProcess:
     def __init__(self, returncode: int | None) -> None:
         self.returncode = returncode
