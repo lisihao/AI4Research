@@ -2,4 +2,33 @@
 set -euo pipefail
 
 repo="$(git rev-parse --show-toplevel)"
-exec bash "$repo/scripts/test-local-fast.sh"
+cd "$repo"
+
+harness="$repo/tools/agent-development-governance/governance.py"
+baseline="${GOVERNANCE_CHANGED_FROM:-}"
+
+if [ -z "$baseline" ]; then
+    for candidate in origin/openJiuwen-Solar upstream/openJiuwen-Solar; do
+        if git rev-parse --verify -q "$candidate^{commit}" >/dev/null; then
+            baseline="$(git merge-base HEAD "$candidate")"
+            break
+        fi
+    done
+fi
+
+if [ -z "$baseline" ]; then
+    echo "Code-as-Harness: cannot resolve openJiuwen-Solar baseline" >&2
+    exit 1
+fi
+
+python3 "$harness" audit --project "$repo" --strict-warnings
+python3 "$harness" verify \
+    --project "$repo" \
+    --changed-from "$baseline" \
+    --scope auto \
+    --level full \
+    --report @git
+python3 "$harness" attest \
+    --project "$repo" \
+    --report @git \
+    --require-level full

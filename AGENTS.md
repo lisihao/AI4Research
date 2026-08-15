@@ -202,3 +202,19 @@ validated it.
 - Keep `.codex-tmp/`, rendered inspections, temporary spreadsheets, Excel
   `~$` files, local environments, and credentials out of commits.
 - Never touch the real home directory during install or uninstall tests.
+
+## Code-as-Harness Completion Contract
+
+For every non-trivial code or governance change, use the repository-local
+`.agent-governance/profile.json` through the shared Agent Development
+Governance Skill. Run `audit` and a quick plan before editing. Before delivery,
+run the selected full gates and produce a fresh attestation bound to the exact
+commit, changed paths, and file bytes. A successful command or agent statement
+is not completion evidence.
+
+The adapter delegates product verification to `scripts/test-local-fast.sh` and
+`scripts/test-local-full.sh`. It must not create a second TaskGraph, evidence
+ledger, closure state, or operator runtime: `harness/` remains canonical.
+After all gates and functional acceptance pass, push the development branch,
+verify that the remote SHA matches, and wait for required CI. Do not mark work
+complete while attestation or CI is stale, missing, skipped, or failed.

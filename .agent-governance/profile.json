@@ -1,0 +1,182 @@
+{
+  "profile_version": 1,
+  "name": "ai4research-openjiuwen-solar",
+  "harness_bundle": {
+    "manifest": "tools/agent-development-governance/manifest.json"
+  },
+  "project_markers": [
+    "AGENTS.md",
+    "harness/solar-harness.sh",
+    "scripts/test-local-fast.sh",
+    "scripts/test-local-full.sh"
+  ],
+  "instruction_sources": [
+    {
+      "path": "AGENTS.md",
+      "required": true,
+      "kind": "agent-instructions"
+    },
+    {
+      "path": "CLAUDE.md",
+      "required": true,
+      "kind": "agent-instructions"
+    },
+    {
+      "path": "docs/architecture/openjiuwen-solar/ADR-006-code-as-harness-adapter.md",
+      "required": true,
+      "kind": "governance-architecture"
+    }
+  ],
+  "scope_rules": [
+    {
+      "scope": "runtime",
+      "patterns": ["harness/**", "tests/harness/**"]
+    },
+    {
+      "scope": "core",
+      "patterns": ["core/**", "tests/core/**", "package.json", "bun.lock"]
+    },
+    {
+      "scope": "desktop-ui",
+      "patterns": [
+        "desktop/**",
+        "harness/status-server/react-app/**",
+        "tests/desktop/**"
+      ]
+    },
+    {
+      "scope": "installer",
+      "patterns": [
+        "install.sh",
+        "install.ps1",
+        "get-solar.sh",
+        "lib/**",
+        "components.d/**",
+        "distribution/**",
+        "deploy/**",
+        "scripts/**",
+        "tests/repository/**",
+        "tests/platform/**"
+      ]
+    },
+    {
+      "scope": "docs",
+      "patterns": ["docs/**", "*.md"]
+    },
+    {
+      "scope": "governance",
+      "patterns": [
+        ".agent-governance/**",
+        ".github/**",
+        ".githooks/**",
+        "tools/agent-development-governance/**",
+        "AGENTS.md",
+        "CLAUDE.md"
+      ],
+      "expands": ["runtime", "core", "desktop-ui", "installer", "docs"]
+    },
+    {
+      "scope": "ci-contract",
+      "patterns": []
+    }
+  ],
+  "hooks": [
+    {
+      "path": ".githooks/pre-push",
+      "required": true
+    }
+  ],
+  "ci_contracts": [
+    {
+      "path": ".github/workflows/agent-governance.yml",
+      "required_text": [
+        "name: Agent Development Governance",
+        "name: Governance attestation",
+        "python3 tools/agent-development-governance/governance.py audit --project . --strict-warnings",
+        "--scope ci-contract",
+        "--require-level full",
+        "actions/upload-artifact@v4"
+      ]
+    },
+    {
+      "path": ".github/workflows/solar-ci.yml",
+      "required_text": [
+        "name: Solar CI",
+        "openJiuwen-Solar",
+        "name: Repository hygiene",
+        "name: Verification release gate"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "diff-check",
+      "label": "Changed text and conflict markers",
+      "command": [
+        "python3",
+        "tools/agent-development-governance/check_changed_text.py",
+        "--project",
+        "."
+      ],
+      "cwd": ".",
+      "scopes": ["always"],
+      "levels": ["quick", "full"],
+      "timeout_seconds": 120
+    },
+    {
+      "id": "governance-contract",
+      "label": "Thin adapter, hook, bundle, and CI contract",
+      "command": [
+        "python3",
+        "tools/agent-development-governance/governance.py",
+        "audit",
+        "--project",
+        ".",
+        "--strict-warnings"
+      ],
+      "cwd": ".",
+      "scopes": ["always"],
+      "levels": ["quick", "full"],
+      "timeout_seconds": 120
+    },
+    {
+      "id": "adapter-contract",
+      "label": "Canonical Harness ownership contract",
+      "command": [
+        "python3",
+        "tests/repository/governance/test_agent_governance_adapter.py"
+      ],
+      "cwd": ".",
+      "scopes": ["always"],
+      "levels": ["quick", "full"],
+      "timeout_seconds": 120
+    },
+    {
+      "id": "repository-hygiene",
+      "label": "Repository hygiene",
+      "command": ["bash", "scripts/check-repo-hygiene.sh"],
+      "cwd": ".",
+      "scopes": ["always"],
+      "levels": ["quick", "full"],
+      "timeout_seconds": 300
+    },
+    {
+      "id": "native-fast",
+      "label": "Repository-native fast gate",
+      "command": ["bash", "scripts/test-local-fast.sh"],
+      "cwd": ".",
+      "scopes": ["runtime", "core", "desktop-ui", "installer"],
+      "levels": ["quick"],
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "native-full",
+      "label": "Repository-native full gate",
+      "command": ["bash", "scripts/test-local-full.sh"],
+      "cwd": ".",
+      "scopes": ["runtime", "core", "desktop-ui", "installer"],
+      "levels": ["full"],
+      "timeout_seconds": 3600
+    }
+  ]
+}

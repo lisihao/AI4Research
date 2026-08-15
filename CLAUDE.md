@@ -74,6 +74,15 @@ verify install/layout/preflight/coordinator and dispatch artifact plumbing
 without consuming Claude quota. Live Claude panes and real delegation results
 must be verified manually when Claude auth/quota is available.
 
+## Code-as-Harness Delivery
+
+Non-trivial code and governance work must use `.agent-governance/profile.json`
+through the shared Agent Development Governance Skill. The executable adapter
+selects repository-native gates, writes a Git-metadata attestation, and blocks
+push when full evidence is absent or stale. It does not replace the canonical
+Solar runtime: Requirement, TaskGraph, gate, evidence, and closure ownership
+remain in `harness/`.
+
 ## Release Safety
 
 Before any public cut, the release dry run must pass and gitleaks must actually
