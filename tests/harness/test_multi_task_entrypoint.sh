@@ -9,19 +9,14 @@ trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP"/{bin,config,lib,sprints,personas,templates,run/multi-task,work}
 export SOLAR_INTENT_DB="$TMP/solar.db"
 export SOLAR_GEMINI_CLI_AUTH=auto
+# This contract exercises the tmux worker-pool path; operatord has separate tests.
+export SOLAR_OPERATORD_SUBMIT_ENABLED=0
 
 cp solar-harness.sh "$TMP/solar-harness.sh"
 cp lib/run-state.sh "$TMP/lib/run-state.sh"
 cp lib/events.sh "$TMP/lib/events.sh"
-cp lib/graph_scheduler.py "$TMP/lib/graph_scheduler.py"
-cp lib/plan_validator.py "$TMP/lib/plan_validator.py"
-cp lib/prerequisite_resolver.py "$TMP/lib/prerequisite_resolver.py"
-cp lib/intent_engine_adapter.py "$TMP/lib/intent_engine_adapter.py"
-cp lib/multi_task_runner.py "$TMP/lib/multi_task_runner.py"
-cp lib/workflow_contract.py "$TMP/lib/workflow_contract.py"
+cp lib/*.py "$TMP/lib/"
 cp lib/tvs_render_cli.ts "$TMP/lib/tvs_render_cli.ts"
-cp lib/claude_surface.py "$TMP/lib/claude_surface.py"
-cp lib/gemini_adapter.py "$TMP/lib/gemini_adapter.py"
 cp config/multi-task-profiles.json "$TMP/config/multi-task-profiles.json"
 cp config/model-registry.json "$TMP/config/model-registry.json"
 cp personas/builder.md "$TMP/personas/builder.md"
@@ -67,6 +62,23 @@ s = s.replace('HARNESS_DIR="${HARNESS_DIR:-$HOME/.solar/harness}"', f'HARNESS_DI
 p.write_text(s)
 PY
 chmod +x "$TMP/solar-harness.sh"
+
+stamp_graph() {
+  PYTHONPATH="$TMP/lib" python3 - "$1" <<'PY'
+import json
+import sys
+
+from plan_validator import stamp_plan_certificate
+
+path = sys.argv[1]
+with open(path, encoding="utf-8") as handle:
+    graph = json.load(handle)
+stamp_plan_certificate(graph)
+with open(path, "w", encoding="utf-8") as handle:
+    json.dump(graph, handle, ensure_ascii=False, indent=2)
+    handle.write("\n")
+PY
+}
 
 cat > "$TMP/bin/tmux" <<'EOF'
 #!/usr/bin/env bash
@@ -121,19 +133,22 @@ cat > "$graph" <<'JSON'
       "goal": "touch A",
       "target_role": "planner",
       "depends_on": [],
-      "write_scope": ["work/a.txt"],
-      "acceptance": ["A handoff exists"]
+      "write_scope": ["workdir/a.txt"],
+      "acceptance": ["A handoff exists"],
+      "max_repair_attempts": 0
     },
     {
       "id": "B",
       "goal": "touch B",
       "depends_on": [],
-      "write_scope": ["work/b.txt"],
-      "acceptance": ["B handoff exists"]
+      "write_scope": ["workdir/b.txt"],
+      "acceptance": ["B handoff exists"],
+      "max_repair_attempts": 0
     }
   ]
 }
 JSON
+stamp_graph "$graph"
 
 PATH="$TMP/bin:$PATH" HARNESS_DIR="$TMP" "$TMP/solar-harness.sh" multi-task start --graph "$graph" --max-workers 2 --cooldown-sec 0 --memory-reserve-gb 0 --once --no-clear >$TMP/solar-multi-task-test.out
 
@@ -144,13 +159,17 @@ grep -q "new-session" "$TMP/tmux-calls.log" || { echo "FAIL: tmux new-session no
 grep -q "Solar Harness Multi-Task" $TMP/solar-multi-task-test.out || { echo "FAIL: summary not rendered"; exit 1; }
 find "$TMP/run/multi-task" -name runner.sh -print0 | xargs -0 -n1 bash -n
 
-python3 - "$graph" <<'PY'
+python3 - "$graph" "$TMP/solar-multi-task-test.out" "$TMP/lib" <<'PY'
 import json, sys
-graph = json.load(open(sys.argv[1], encoding="utf-8"))
+from pathlib import Path
+sys.path.insert(0, sys.argv[3])
+from graph_scheduler import load_graph
+graph = load_graph(sys.argv[1])
+diagnostics = Path(sys.argv[2]).read_text(encoding="utf-8", errors="replace")
 nodes = {n["id"]: n for n in graph["nodes"]}
 for node_id in ("A", "B"):
     n = nodes[node_id]
-    assert n.get("status") == "dispatched", (node_id, n)
+    assert n.get("status") == "dispatched", (node_id, n, diagnostics)
     assert str(n.get("assigned_to", "")).startswith("multi-task:"), (node_id, n)
     assert str(n.get("dispatch_id", "")).startswith("mt-"), (node_id, n)
 PY
@@ -184,13 +203,14 @@ cat > "$graph2" <<'JSON'
       "id": "G1",
       "goal": "gemini smoke",
       "depends_on": [],
-      "write_scope": ["work/gemini.txt"],
-      "preferred_model": "gemini",
-      "acceptance": ["Gemini dispatch exists"]
+      "write_scope": ["workdir/gemini.txt"],
+      "acceptance": ["Gemini dispatch exists"],
+      "max_repair_attempts": 0
     }
   ]
 }
 JSON
+stamp_graph "$graph2"
 PATH="$TMP/bin:$PATH" HARNESS_DIR="$TMP" "$TMP/solar-harness.sh" multi-task start --graph "$graph2" --profile gemini-builder --max-workers 3 --cooldown-sec 0 --memory-reserve-gb 0 --once --no-clear >$TMP/solar-multi-task-gemini.out
 gemini_runner=$(find "$TMP/run/multi-task" -path "*sprint-20260520-gemini*/runner.sh" -print | head -1)
 [[ -n "$gemini_runner" ]] || { echo "FAIL: gemini runner missing"; exit 1; }
@@ -210,19 +230,21 @@ cat > "$graph_deepseek" <<'JSON'
       "id": "D1",
       "goal": "must not dispatch without a passing DeepSeek probe",
       "depends_on": [],
-      "write_scope": ["work/deepseek.txt"],
-      "acceptance": ["No dispatch until capability is ok"]
+      "write_scope": ["workdir/deepseek.txt"],
+      "acceptance": ["No dispatch until capability is ok"],
+      "max_repair_attempts": 0
     }
   ]
 }
 JSON
+stamp_graph "$graph_deepseek"
 before_deepseek=$(find "$TMP/run/multi-task" -name status.json | wc -l | tr -d ' ')
 PATH="$TMP/bin:$PATH" HARNESS_DIR="$TMP" "$TMP/solar-harness.sh" multi-task start --graph "$graph_deepseek" --profile deepseek-builder --max-workers 10 --cooldown-sec 0 --memory-reserve-gb 0 --once --no-clear >$TMP/solar-multi-task-deepseek-gate.out
 after_deepseek=$(find "$TMP/run/multi-task" -name status.json | wc -l | tr -d ' ')
 [[ "$before_deepseek" -eq "$after_deepseek" ]] \
   || { echo "FAIL: unavailable DeepSeek profile dispatched work"; exit 1; }
-grep -Eq "capability_unavailable|model_matrix.*error=1" $TMP/solar-multi-task-deepseek-gate.out \
-  || { echo "FAIL: unavailable DeepSeek profile did not expose capability gate"; exit 1; }
+grep -Eq "capability_unavailable|model_matrix.*error=[1-9][0-9]*" $TMP/solar-multi-task-deepseek-gate.out \
+  || { cat "$TMP/solar-multi-task-deepseek-gate.out"; echo "FAIL: unavailable DeepSeek profile did not expose capability gate"; exit 1; }
 
 old_task="$TMP/run/multi-task/mt-old-terminal"
 mkdir -p "$old_task"
@@ -405,12 +427,14 @@ cat > "$graph3" <<'JSON'
       "id": "R1",
       "goal": "must not dispatch from status screen query",
       "depends_on": [],
-      "write_scope": ["work/readonly.txt"],
-      "acceptance": ["No dispatch on status query"]
+      "write_scope": ["workdir/readonly.txt"],
+      "acceptance": ["No dispatch on status query"],
+      "max_repair_attempts": 0
     }
   ]
 }
 JSON
+stamp_graph "$graph3"
 before_readonly=$(find "$TMP/run/multi-task" -name status.json | wc -l | tr -d ' ')
 COLUMNS=120 LINES=24 PATH="$TMP/bin:$PATH" HARNESS_DIR="$TMP" "$TMP/solar-harness.sh" multi-task screen --graph "$graph3" --command "有哪些任务" --max-workers 10 --cooldown-sec 0 --memory-reserve-gb 0 --no-clear >$TMP/solar-multi-task-screen-readonly-query.out
 after_readonly=$(find "$TMP/run/multi-task" -name status.json | wc -l | tr -d ' ')

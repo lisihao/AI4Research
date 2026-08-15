@@ -19,9 +19,12 @@ def test_product_autosci_research_scheduler_writes_scientific_lifecycle(tmp_path
     paper = write_demo_paper(harness_dir)
     run_id = unique_run_id("phase-c-research")
 
+    # This isolated run verifies scheduler dispatch, not the outer lifecycle
+    # approval boundary; only the local paper-ingest node is selected.
     proc = run_autosci(
         harness_dir,
-        f"$research phase-c scheduler --paper {paper} --scheduler-run --scheduler-timeout 20 --run-id {run_id}",
+        f"$research phase-c scheduler --paper {paper} --scheduler-run "
+        f"--scheduler-timeout 20 --gate-mode autosci_native --run-id {run_id}",
     )
     summary = load_stdout_json(proc)
 
