@@ -2748,7 +2748,7 @@ def _github_trends_item(run_dir: Path) -> dict:
     html_path = run_dir / "digest.html"
     md_path = run_dir / "digest.md"
     data = _read_json_file(digest_json_path)
-    
+
     date_str = _ai_influence_date_from_path(run_dir) or run_dir.name
     analysis = data.get("analysis") if isinstance(data.get("analysis"), dict) else {}
     windows = analysis.get("windows") if isinstance(analysis.get("windows"), dict) else {}
@@ -3311,7 +3311,7 @@ def _ai_influence_payload_internal(
             for child in sorted((p for p in phase_dir.iterdir() if p.is_dir()), key=lambda p: p.stat().st_mtime, reverse=True):
                 if (child / "report.html").exists() and (child / "phase-report.json").exists():
                     items.append(_phase_report_item(child, phase_dir.name))
-                    
+
     github_report_root = tech_hotspot_raw_dir / "github-trend-report"
     if github_report_root.exists():
         for child in github_report_root.iterdir():
@@ -4616,9 +4616,9 @@ async function regenerateDaily() {{
 def _ai_influence_collectors_section() -> str:
     import subprocess
     import glob
-    
+
     sections = []
-    
+
     def get_log_tail(path_glob, lines=10):
         try:
             files = sorted(glob.glob(os.path.expanduser(path_glob)))
@@ -4629,7 +4629,7 @@ def _ai_influence_collectors_section() -> str:
             return html.escape(out)
         except Exception as e:
             return f"读取日志出错：{html.escape(str(e))}"
-            
+
     def get_process_status(pattern):
         try:
             out = subprocess.check_output(['pgrep', '-f', pattern], text=True).strip()
@@ -4642,7 +4642,7 @@ def _ai_influence_collectors_section() -> str:
     # YouTube Backfill
     yt_log = get_log_tail("~/Solar/harness/logs/youtube_backfill_*.log", lines=15)
     yt_status = get_process_status("youtube_weekly_backfill.py")
-    
+
     sections.append(f'''
     <div class="group">
         <div class="group-head">
@@ -4691,7 +4691,7 @@ def _ai_influence_collectors_section() -> str:
         </div>
     </div>
     ''')
-    
+
     return "".join(sections)
 
 
@@ -9705,7 +9705,7 @@ def _multi_task_shell_panes_info() -> list:
     raw_panes = _run_tmux(cmd)
     if not raw_panes:
         return []
-    
+
     leases = {}
     lease_dir = HARNESS_DIR / "run" / "operator-leases"
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
@@ -9719,7 +9719,7 @@ def _multi_task_shell_panes_info() -> list:
                 pane_target = data.get("pane")
                 if pane_target:
                     leases[pane_target] = data
-                    
+
     run_dir = HARNESS_DIR / "run" / "multi-task"
     latest_by_window = {}
     if run_dir.exists():
@@ -9752,14 +9752,14 @@ def _multi_task_shell_panes_info() -> list:
         lease = leases.get(pane_target) or leases.get(f"{session}:{w_idx}.{p_idx}") or {}
         task_meta = latest_by_window.get(w_name) or {}
         task_status = str(task_meta.get("status") or "").lower()
-        
+
         tail = _run_tmux(["capture-pane", "-t", pane_target, "-p", "-S", "-40"], timeout=1.0)
         status = _headless_pane_status(p_cmd, p_title, tail)
         if lease:
             status = "leased"
         elif task_status in {"completed", "completed_aligned", "failed", "failed_missing_handoff", "cancelled", "reaped", "reaped_stale_active"} or task_status.startswith("reaped"):
             status = "historical_active" if w_active == "1" else "reusable_idle"
-            
+
         panes_list.append({
             "pane": pane_target,
             "session": session,
@@ -12790,7 +12790,7 @@ function renderContractSummary(data, compact) {
   const title = data.title || 'Contract Summary';
   const summary = data.summary || '';
   const link = data.route ? `<a href="${data.route}" target="_blank" rel="noopener" style="color: var(--accent-2); font-weight:800;">查看详情</a>` : '';
-  
+
   if (compact) {
     return `
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -13225,11 +13225,11 @@ function renderOperatorsPage() {
   return;
   const po = data.physical_operators;
   const items = po.items || [];
-  
+
   // Calculate metrics dynamically
   const total = items.length;
   let enabled = 0, available = 0, busy = 0, idle = 0, disabled = 0;
-  
+
   items.forEach(item => {
     if (item.enabled) enabled++;
     if (item.available) available++;
@@ -13241,7 +13241,7 @@ function renderOperatorsPage() {
       idle++;
     }
   });
-  
+
   // Render metrics container
   document.getElementById('operator-metrics-container').innerHTML = `
     <div class="health-metrics">
@@ -13253,7 +13253,7 @@ function renderOperatorsPage() {
       <div class="mini-metric"><div class="kv-label">Disabled</div><span class="num" style="color:#fbbf24;">${disabled}</span></div>
     </div>
   `;
-  
+
   // Filter items
   const filtered = items.filter(item => {
     // Role filter
@@ -13290,7 +13290,7 @@ function renderOperatorsPage() {
     }
     return true;
   });
-  
+
   // Render list/table
   if (!filtered.length) {
     document.getElementById('operator-cards-container').innerHTML = '<div class="muted" style="padding:2rem; text-align:center;">没有找到符合过滤条件的物理算子。</div>';
@@ -13307,12 +13307,12 @@ function renderOperatorsPage() {
         <div style="font-size: 0.75rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">操作</div>
       </div>
     `;
-    
+
     filtered.forEach((item, idx) => {
       let statusClass = "missing";
       let statusLabel = item.runtime_state || "unknown";
       let rowStyle = "";
-      
+
       if (!item.enabled) {
         statusClass = "missing";
         statusLabel = "disabled";
@@ -13328,13 +13328,13 @@ function renderOperatorsPage() {
       } else {
         statusClass = "warn";
       }
-      
+
       let leaseText = '<span class="muted">-</span>';
       if (item.sprint_id || item.task_id) {
         const expires = item.expires_at ? new Date(item.expires_at).toLocaleTimeString() : 'N/A';
         leaseText = `
           <div>
-            <span class="tech-id" style="color: var(--accent-2); font-weight:800;">${esc(item.sprint_id || '')}</span> / 
+            <span class="tech-id" style="color: var(--accent-2); font-weight:800;">${esc(item.sprint_id || '')}</span> /
             <span class="tech-id">${esc(item.task_id || '')}</span>
             <span class="muted" style="font-size:0.75rem; margin-left:0.4rem;">(Expires: ${esc(expires)})</span>
           </div>
@@ -13355,7 +13355,7 @@ function renderOperatorsPage() {
           </div>
         `;
       }
-      
+
       listHtml += `
         <div class="op-row" style="${rowStyle}">
           <div>
@@ -13387,7 +13387,7 @@ function renderOperatorsPage() {
         </div>
       `;
     });
-    
+
     listHtml += '</div>';
     document.getElementById('operator-cards-container').innerHTML = listHtml;
   }
@@ -13460,7 +13460,7 @@ function renderPanesPage() {
     .join(' · ') || 'N/A';
   const modelSummary = compactCounts(modelCounts);
   const operatorTypeSummary = compactCounts(operatorTypeCounts);
-  
+
   // Calculate metrics
   const total = pool.total ?? panes.length;
   const idle = pool.idle ?? panes.filter(p => p.status === 'idle').length;
@@ -13482,7 +13482,7 @@ function renderPanesPage() {
   };
   const runtimeBusy = runtimeTruth.running + runtimeTruth.leased;
   const mismatch = runtimeBusy > 0 && running === 0;
-  
+
   // Render metrics container
   document.getElementById('pane-metrics-container').innerHTML = `
     <div class="health-metrics">
@@ -13517,7 +13517,7 @@ function renderPanesPage() {
     <div class="muted" style="margin-top:0.5rem;">contract: shrink 到目标池大小；保留可复用历史壳，不自动杀当前选中的历史壳。</div>
     <div class="muted" style="margin-top:0.35rem;">ops: 'compact-session' 会安全切走并收掉历史 current window；'detach-and-anchor' 只把 session current window 切到 anchor。</div>
   `;
-  
+
   // Filter panes
   const filtered = panes.filter(p => {
     // State filter
@@ -13542,7 +13542,7 @@ function renderPanesPage() {
     }
     return true;
   });
-  
+
   // Render panes list (as a beautiful detailed table)
   if (!filtered.length) {
     document.getElementById('pane-grid-container').innerHTML = '<div class="muted" style="padding:2rem; text-align:center;">没有找到符合过滤条件的 Headless Pane。</div>';
@@ -13556,19 +13556,19 @@ function renderPanesPage() {
       else if (p.status === 'leased') statusClass = "default";
       else if (p.status === 'blocked' || p.status === 'auth_expired' || p.status === 'cooldown') statusClass = "warn";
       else statusClass = "warn";
-      
+
       let leaseText = "-";
       if (p.lease && p.lease.task_id) {
         leaseText = `<div style="font-weight: 800; font-size: 0.8rem;"><span class="tech-id">${esc(p.lease.sprint_id || '')}</span> / <span class="tech-id">${esc(p.lease.task_id)}</span></div>`;
       } else if (p.task && p.task.task_id) {
         leaseText = `<div style="font-weight: 800; font-size: 0.8rem;"><span class="tech-id">${esc(p.task.sprint_id || '')}</span> / <span class="tech-id">${esc(p.task.task_id)}</span></div>`;
       }
-      
+
       let cmdHighlight = p.current_command;
       if (p.status === 'running') {
         cmdHighlight = `<span class="badge warn" style="font-family:ui-monospace,monospace;">${esc(p.current_command)}</span>`;
       }
-      
+
       const taskStatus = ((p.task && p.task.status) || '-');
       const modelLabel = p.model || 'N/A';
       const backendLabel = p.backend || p.pool || 'N/A';

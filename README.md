@@ -11,7 +11,7 @@ AI4Research 是 Solar 体系在 `Stellven/AI4Research` 仓库中的产品化分�
 - 同时支撑代码交付（Product Delivery）和科研工作流（AutoSci / DeepResearch）。
 
 > **当前发布线：** `VERSION` 为 `1.0.0-rc.9`，根目录 Bun package、桌面包与 pipx metadata 均由该文件同步。
-> **当前主分支：** `openJiuwen-Solar`。  
+> **当前主分支：** `openJiuwen-Solar`。
 > **成熟度：** Release Candidate；适合本地试用、架构研究与受控团队内实验，不应直接视为多租户生产控制平面。
 
 ---

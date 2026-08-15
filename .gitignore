@@ -64,6 +64,13 @@ bun.lockb
 *.cache
 /.cache/
 
+# Linked worktrees may reuse the primary checkout's installed dependencies via
+# symlinks. Git does not treat a symlink as a directory for the rules above.
+/.venv
+/node_modules
+/desktop/node_modules
+/harness/status-server/react-app/node_modules
+
 # 仓库根目录的临时工作区
 /tmp/
 /tmp_*/
