@@ -1260,6 +1260,8 @@ def test_autosci_skill_shim_research_scheduler_run_attaches_blocked_summary(tmp_
         "This paper verifies generic workflow dispatch for the research scheduler path.\n",
         encoding="utf-8",
     )
+    # The scheduler contract is under test; this selects only local nodes while
+    # the production route keeps its strict approval mode by default.
     proc = run_shim(
         tmp_path,
         "$research",
@@ -1269,6 +1271,8 @@ def test_autosci_skill_shim_research_scheduler_run_attaches_blocked_summary(tmp_
         "--scheduler-run",
         "--scheduler-timeout",
         "20",
+        "--gate-mode",
+        "autosci_native",
         "--run-id",
         "shim-research-generic-scheduler-run",
     )
@@ -1347,6 +1351,8 @@ def test_autosci_skill_shim_research_scheduler_demo_uses_multi_node_preset(tmp_p
         "This paper verifies the explicit multi-node scheduler demo preset.\n",
         encoding="utf-8",
     )
+    # The scheduler contract is under test; this selects only local nodes while
+    # the production route keeps its strict approval mode by default.
     proc = run_shim(
         tmp_path,
         "$research",
@@ -1357,6 +1363,8 @@ def test_autosci_skill_shim_research_scheduler_demo_uses_multi_node_preset(tmp_p
         "--scheduler-demo",
         "--scheduler-timeout",
         "20",
+        "--gate-mode",
+        "autosci_native",
         "--run-id",
         "shim-research-demo-scheduler",
     )
@@ -12131,17 +12139,20 @@ def test_autosci_skill_shim_runs_review_as_artifact_review(tmp_path: Path) -> No
         "--run-id",
         "shim-review-artifact",
     )
-    assert proc.returncode == 0, proc.stderr
+    assert proc.returncode != 0
     summary = json.loads(proc.stdout)
     assert summary["skill"] == "review"
-    assert summary["execution_status"] == "partial"
+    assert summary["execution_status"] == "failed"
     assert summary["action_count"] == 1
 
     payload = json.loads(Path(summary["evidence_path"]).read_text(encoding="utf-8"))
     action = payload["outputs"]["skill_run"]["actions"][0]
     assert action["action"] == "review_artifact"
     assert action["schema"] == "artifact_review.v1"
-    assert action["gate_status"] == "passed"
+    assert action["gate_status"] == "failed"
+    assert "normalized proof contract must be supported" in action["reasons"]
+    assert "normalized proof contract must contain claims" in action["reasons"]
+    assert "reviewer must reload artifact and proof bundle from disk" in action["reasons"]
     review_evidence = json.loads(Path(action["evidence_path"]).read_text(encoding="utf-8"))
     review = review_evidence["outputs"]["review"]
     assert review["review_mode"] == "local_surrogate"

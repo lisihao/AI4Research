@@ -270,6 +270,10 @@ def _wait_for_result(result_path: Path, daemon_pid: int | None, timeout_seconds:
 
 def _import_operator_runtime(harness_dir: Path):
     os.environ["HARNESS_DIR"] = str(harness_dir)
+    # Detached operator workers must use the same supported Python runtime as
+    # the scheduler. Isolated harness roots do not have a sibling .venv, and
+    # falling back to macOS /usr/bin/python3 selects unsupported Python 3.9.
+    os.environ.setdefault("SOLAR_AUTOSCI_PYTHON", sys.executable)
     os.environ.setdefault("SOLAR_OPERATORD_AUTO_KICK", "1")
     os.environ.setdefault("SOLAR_OPERATORD_ONCE_POLL_INTERVAL", "0.1")
     os.environ.setdefault("SOLAR_OPERATORD_ONCE_MAX_WAIT_SECONDS", "20")

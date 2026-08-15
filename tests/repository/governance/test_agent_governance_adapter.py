@@ -56,6 +56,18 @@ class AgentGovernanceAdapterTests(unittest.TestCase):
         self.assertIn("actions/upload-artifact@v4", workflow)
         self.assertTrue((ROOT / ".github/workflows/solar-ci.yml").is_file())
 
+    def test_required_ci_does_not_hide_pull_request_failures(self) -> None:
+        for relative_path in (
+            ".github/workflows/solar-ci.yml",
+            ".github/workflows/install-matrix.yml",
+        ):
+            workflow = (ROOT / relative_path).read_text(encoding="utf-8")
+            self.assertNotIn(
+                "continue-on-error:",
+                workflow,
+                f"{relative_path} must fail closed on pull requests and pushes",
+            )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
